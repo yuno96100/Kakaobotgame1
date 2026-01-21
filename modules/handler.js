@@ -1,20 +1,50 @@
 const UserDB = require("./user");
+const AdminDB = require("./admin");
 const Champions = require("./champions");
 
 const Handler = {};
 
 Handler.process = function(msg, sender, replier) {
+    // 1. 권한 체크
+    var admins = AdminDB.getAdmins();
+    var isMaster = (sender === "시스템"); 
+    var isAdmin = (admins.indexOf(sender) > -1);
+
+    // 2. 가입 여부 체크 (중요: 이 코드가 있어야 아래에서 에러가 안 납니다)
     var path = "sdcard/msgbot/Bots/sub/data/" + sender + ".json";
     var isRegistered = java.io.File(path).exists();
 
-    // [이벤트 감지: 오픈채팅봇의 환영 문구 확인]
-    // 오픈채팅봇이 "소환사의 협곡에 오신것을 환영합니다."를 포함한 메시지를 보냈을 때
+    // [최종 관리자 전용 명령어]
+    if (isMaster) {
+        if (msg.startsWith(".권한부여 ")) {
+            var target = msg.replace(".권한부여 ", "").trim();
+            if (AdminDB.add(target)) replier.reply("✅ [" + target + "]님에게 관리자 권한을 부여했습니다.");
+            else replier.reply("⚠️ 이미 관리자이거나 오류가 발생했습니다.");
+            return;
+        }
+        if (msg.startsWith(".권한해제 ")) {
+            var target = msg.replace(".권한해제 ", "").trim();
+            if (AdminDB.remove(target)) replier.reply("✅ [" + target + "]님의 관리자 권한을 해제했습니다.");
+            else replier.reply("❌ 해제할 수 없는 대상입니다.");
+            return;
+        }
+    }
+
+    // [관리자 공통 메뉴]
+    if (isAdmin) {
+        if (msg === ".관리자메뉴") {
+            var m = "🛠️ [ 관리자 메뉴 ]\n";
+            m += ".업데이트 - 시스템 동기화\n";
+            m += ".시스템 - 상태 점검\n";
+            if (isMaster) m += ".권한부여/해제 [닉네임]";
+            replier.reply(m);
+            return;
+        }
+    }
+
+    // [이벤트 감지: 환영 문구]
     if (msg.includes("소환사의 협곡에 오신것을 환영합니다.")) {
-        var welcomeGuide = "📜 [ 가입 안내 ]\n";
-        welcomeGuide += "━━━━━━━━━━━━━━\n";
-        welcomeGuide += "새로 오신 소환사님, 반갑습니다!\n";
-        welcomeGuide += "게임을 시작하려면 [.가입]을 입력해주세요.\n";
-        welcomeGuide += "━━━━━━━━━━━━━━";
+        var welcomeGuide = "📜 [ 가입 안내 ]\n━━━━━━━━━━━━━━\n새로 오신 소환사님, 반갑습니다!\n게임을 시작하려면 [.가입]을 입력해주세요.\n━━━━━━━━━━━━━━";
         replier.reply(welcomeGuide);
         return;
     }
@@ -22,22 +52,16 @@ Handler.process = function(msg, sender, replier) {
     // [명령어: .가입]
     if (msg === ".가입") {
         if (isRegistered) {
-            replier.reply("⚠️ 이미 소환사 등록이 완료된 상태입니다.");
+            replier.reply("⚠️ 이미 등록된 소환사입니다.");
             return;
         }
-        
-        UserDB.get(sender); // 신규 유저 데이터 생성
-        
-        var success = "🎊 [ 소환사 등록 성공 ]\n";
-        success += "━━━━━━━━━━━━━━\n";
-        success += sender + "님의 데이터가 생성되었습니다!\n\n";
-        success += "📜 '.메뉴'를 입력하여 기능을 확인하세요.";
-        replier.reply(success);
+        UserDB.get(sender); 
+        replier.reply("🎊 [" + sender + "]님 등록 성공! '.메뉴'를 입력하세요.");
         return;
     }
 
-    // [미가입자 차단]
-    if (!isRegistered) {
+    // [미가입자 차단] - 관리자는 차단하지 않음
+    if (!isRegistered && !isAdmin) {
         if (msg.startsWith(".")) {
             replier.reply("👋 아직 등록되지 않은 소환사입니다.\n'.가입'을 먼저 진행해주세요!");
         }
@@ -45,28 +69,18 @@ Handler.process = function(msg, sender, replier) {
     }
 
     // [가입 유저 전용 메뉴]
-    var user = UserDB.get(sender);
-
-    if (msg === ".메뉴" || msg === ".도움말") {
-        var menu = "🎮 [ 메인 메뉴 ]\n";
-        menu += "━━━━━━━━━━━━━━\n";
-        menu += "1️⃣ 내 정보 확인 ➔ .정보\n";
-        menu += "2️⃣ 보유 캐릭터 ➔ .보유캐릭터\n";
-        menu += "3️⃣ 일일 보상 ➔ .출석\n";
-        menu += "━━━━━━━━━━━━━━";
-        replier.reply(menu);
-        return;
-    }
-
-    if (msg === ".정보") {
-        var total = user.win + user.loss;
-        var rate = total === 0 ? 0 : ((user.win / total) * 100).toFixed(1);
-        var info = "👤 [" + user.name + " 정보]\n";
-        info += "⭐ Lv." + user.level + " / 💰 " + user.money.toLocaleString() + " G\n";
-        info += "📊 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)\n";
-        info += "📜 상세 캐릭터: '.보유캐릭터'";
-        replier.reply(info);
-        return;
+    if (isRegistered) {
+        var user = UserDB.get(sender);
+        if (msg === ".메뉴" || msg === ".도움말") {
+            replier.reply("🎮 [ 메인 메뉴 ]\n━━━━━━━━━━━━━━\n1️⃣ 내 정보 ➔ .정보\n2️⃣ 캐릭터 ➔ .보유캐릭터\n3️⃣ 일일 보상 ➔ .출석");
+            return;
+        }
+        if (msg === ".정보") {
+            var total = user.win + user.loss;
+            var rate = total === 0 ? 0 : ((user.win / total) * 100).toFixed(1);
+            replier.reply("👤 [" + user.name + " 정보]\n⭐ Lv." + user.level + " / 💰 " + user.money.toLocaleString() + " G\n📊 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)");
+            return;
+        }
     }
 };
 
