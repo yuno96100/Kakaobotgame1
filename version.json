@@ -1,6 +1,6 @@
 {
-  "version": "1.0.5",
-  "updateNote": "관리자도 유저다",
+  "version": "1.0.6",
+  "updateNote": "기존유저 데이터 업데이트",
   "date": "2026-01-22",
   "files": [
     "main.js",
