@@ -1,9 +1,10 @@
 {
   "version": "1.0.2",
-  "updateNote": "테스트 및 유저 DB 시스템 기초 추가",
+  "updateNote": "모듈화 시스템 도입",
   "date": "2026-01-21",
   "files": [
     "main.js",
-    "modules/user.js"
+    "modules/user.js",
+    "modules/handler.js"
   ]
 }
