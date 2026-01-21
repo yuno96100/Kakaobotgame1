@@ -1,5 +1,9 @@
 {
-  "version": "1.0.1",
-  "updateNote": "버전테스트",
-  "date": "2026-01-21"
+  "version": "1.0.2",
+  "updateNote": "테스트 및 유저 DB 시스템 기초 추가",
+  "date": "2026-01-21",
+  "files": [
+    "main.js",
+    "modules/user.js",
+  ]
 }
