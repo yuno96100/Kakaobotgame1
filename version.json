@@ -1,6 +1,6 @@
 {
-  "version": "1.0.7",
-  "updateNote": "관리자 모듈 추가 및 경로 오류 수정",
+  "version": "1.0.8",
+  "updateNote": "유저정보 오류수정",
   "files": [
     "main.js",
     "modules/handler.js",
