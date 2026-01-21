@@ -1,6 +1,6 @@
 {
-  "version": "1.0.9",
-  "updateNote": "데이터 초기화및 백업",
+  "version": "1.0.10",
+  "updateNote": "핸들러 오류 최적화",
   "files": [
     "main.js",
     "modules/handler.js",
