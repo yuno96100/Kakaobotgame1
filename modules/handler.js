@@ -123,8 +123,34 @@ Handler.process = function(msg, sender, replier) {
     }
 
 
+    // ... (상단 1~5 섹션 생략) ...
+
     // ------ [ 6. 관리자 전용 명령어 섹션 ] ------
     if (isAdmin && isMaster) {
+        
+        // [명령어: .관리자명령어] - 전체 목록 안내
+        if (msg === ".관리자명령어") {
+            var adminHelp = "🛠️ [ 관리자 전용 명령어 ]\n";
+            adminHelp += "━━━━━━━━━━━━━━\n";
+            adminHelp += "1️⃣ 시스템 관리\n";
+            adminHelp += "• .업데이트 - GitHub 최신 코드 동기화\n";
+            adminHelp += "• .시스템 - 서버 및 경로 상태 점검\n";
+            adminHelp += "• .권한부여 [닉네임] - 추가 관리자 등록\n\n";
+            
+            adminHelp += "2️⃣ 데이터 보호\n";
+            adminHelp += "• .백업 - 현재 모든 유저 데이터 복사\n";
+            adminHelp += "• .백업목록 - 저장된 백업 데이터 확인\n";
+            adminHelp += "• .복구 확인 - 백업본으로 전체 데이터 복구\n\n";
+            
+            adminHelp += "3️⃣ 유저 관리\n";
+            adminHelp += "• .초기화 [닉네임] - 특정 유저 정보 리셋\n";
+            adminHelp += "━━━━━━━━━━━━━━\n";
+            adminHelp += "🔙 메인 메뉴로 가려면 [.돌아가기]";
+            
+            replier.reply(adminHelp);
+            return;
+        }
+
         // [백업]
         if (msg === ".백업") {
             try {
@@ -138,7 +164,7 @@ Handler.process = function(msg, sender, replier) {
                         FileStream.write("sdcard/msgbot/Bots/sub/backup/" + files[i].getName(), content);
                     }
                 }
-                replier.reply("💾 [백업 완료] 데이터가 안전하게 저장되었습니다.");
+                replier.reply("💾 [백업 완료] 현재 모든 소환사의 데이터가 backup 폴더에 저장되었습니다.");
             } catch (e) { replier.reply("❌ 백업 실패: " + e.message); }
             return;
         }
@@ -172,7 +198,7 @@ Handler.process = function(msg, sender, replier) {
                     var content = FileStream.read(files[i].getAbsolutePath());
                     FileStream.write("sdcard/msgbot/Bots/sub/data/" + files[i].getName(), content);
                 }
-                replier.reply("✅ [복구 완료] 백업 데이터가 적용되었습니다.");
+                replier.reply("✅ [복구 완료] 모든 유저 데이터가 백업 시점으로 복구되었습니다.");
             } catch (e) { replier.reply("❌ 복구 실패: " + e.message); }
             return;
         }
@@ -182,10 +208,10 @@ Handler.process = function(msg, sender, replier) {
             var target = msg.replace(".초기화 ", "").trim();
             var resetData = { name: target, level: 1, exp: 0, maxExp: 100, money: 1000, win: 0, loss: 0, ownedChars: [101], lastAttendance: "" };
             UserDB.save(target, resetData);
-            replier.reply("⚠️ [" + target + "]님의 정보가 초기화되었습니다.");
+            replier.reply("⚠️ [" + target + "]님의 정보를 초기 상태(Lv.1, 1000G)로 리셋했습니다.");
             return;
         }
     }
-}; // Handler.process 끝
+};
 
 module.exports = Handler;
