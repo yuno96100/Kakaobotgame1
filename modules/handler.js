@@ -5,7 +5,7 @@ const Champions = require("./champions");
 const Handler = {};
 
 Handler.process = function(msg, sender, replier) {
-    // 1. 권한 정보 및 가입 상태 확인
+    // 1. 관리자 권한 및 데이터 경로 확인
     var admins = AdminDB.getAdmins();
     var isMaster = (sender === "관리자");
     var isAdmin = (admins.indexOf(sender) > -1 || isMaster);
@@ -13,40 +13,42 @@ Handler.process = function(msg, sender, replier) {
     var path = "sdcard/msgbot/Bots/sub/data/" + sender + ".json";
     var isRegistered = java.io.File(path).exists();
 
-    // 2. 미가입자 처리 (관리자 포함 모든 유저 공통)
+    // 2. [미가입 유저 처리] - 기존 유저/신규 유저 공통
     if (!isRegistered) {
+        // 유저가 가입 명령어를 입력한 경우
         if (msg === ".가입") {
-            UserDB.get(sender); // 데이터 생성
-            replier.reply("🎊 [ 소환사 등록 성공 ]\n━━━━━━━━━━━━━━\n" + sender + "님, 환영합니다!\n이제 게임과 관리 기능을 모두 이용하실 수 있습니다.");
+            UserDB.get(sender); // 신규 유저 파일 생성
+            var success = "🎊 [ 소환사 등록 성공 ]\n";
+            success += "━━━━━━━━━━━━━━\n";
+            success += sender + "님, 소환사의 리그에 합류하신 것을 환영합니다!\n\n";
+            success += "📜 '.메뉴'를 입력하여 모험을 시작하세요.";
+            replier.reply(success);
             return;
         }
 
-        // 가입 전에는 어떤 말을 해도 환영 문구 출력
-        var welcome = "⚔️ [ 소환사의 협곡에 오신것을 환영합니다 ]\n━━━━━━━━━━━━━━\n";
-        welcome += "반갑습니다, " + sender + "님!\n이곳은 매일 결투가 진행되는 리그입니다.\n\n👉 참여를 위해 [.가입]을 입력해주세요!";
-        replier.reply(welcome);
+        // 가입하지 않은 유저가 아무 말(명령어 포함)이나 했을 때 안내
+        var guide = "⚔️ [ 소환사의 협곡에 오신것을 환영합니다 ]\n";
+        guide += "━━━━━━━━━━━━━━\n";
+        guide += "아직 등록되지 않은 소환사입니다.\n";
+        guide += "이곳은 매일 결투가 진행되는 소환사의 리그입니다.\n\n";
+        guide += "👉 참여를 위해 [.가입]을 입력해주세요!";
+        replier.reply(guide);
         return;
     }
 
-    // 3. [관리자 전용 기능] - 가입된 상태에서만 작동
-    if (isAdmin) {
-        if (isMaster && msg.startsWith(".권한부여 ")) {
+    // 3. [가입된 유저 및 관리자 공용 로직]
+    var user = UserDB.get(sender);
+
+    // 관리자 전용 명령어 (가입된 관리자만 가능)
+    if (isAdmin && isMaster) {
+        if (msg.startsWith(".권한부여 ")) {
             var target = msg.replace(".권한부여 ", "").trim();
             if (AdminDB.add(target)) replier.reply("✅ [" + target + "]님에게 권한을 부여했습니다.");
             return;
         }
-        
-        if (msg === ".관리자메뉴") {
-            var m = "🛠️ [ 관리자 기능 ]\n.업데이트 / .시스템 / .버전";
-            if(isMaster) m += "\n.권한부여 [닉네임]";
-            replier.reply(m);
-            return;
-        }
     }
 
-    // 4. [게임 전용 기능] - 가입된 모든 유저(관리자 포함) 공통
-    var user = UserDB.get(sender);
-
+    // 유저 공통 메뉴
     if (msg === ".메뉴" || msg === ".도움말") {
         var menu = "🎮 [ 메인 메뉴 ]\n━━━━━━━━━━━━━━\n";
         menu += "1️⃣ 내 정보 ➔ .정보\n";
@@ -69,14 +71,14 @@ Handler.process = function(msg, sender, replier) {
     }
 
     if (msg === ".캐릭터") {
-        replier.reply("⚔️ " + user.name + "님이 보유한 캐릭터 리스트입니다.\n(추후 캐릭터 목록 연동 예정)");
+        replier.reply("⚔️ " + user.name + "님의 캐릭터 인벤토리입니다.\n(보유한 캐릭터 목록 표시 준비중)");
         return;
     }
 
     if (msg === ".출석") {
         user.money += 100;
         UserDB.save(sender, user);
-        replier.reply("🎁 출석 보상 100G 지급!\n(현재 자산: " + user.money.toLocaleString() + "G)");
+        replier.reply("🎁 매일 출석 보상 100G 지급!\n(현재 자산: " + user.money.toLocaleString() + "G)");
         return;
     }
 };
