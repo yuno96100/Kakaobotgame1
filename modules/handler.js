@@ -5,82 +5,77 @@ const Champions = require("./champions");
 const Handler = {};
 
 Handler.process = function(msg, sender, replier) {
-    // 1. 권한 체크
+    // 1. 관리자 및 가입 여부 체크
     var admins = AdminDB.getAdmins();
-    var isMaster = (sender === "관리자"); 
-    var isAdmin = (admins.indexOf(sender) > -1);
+    // 관리자 이름을 '관리자'로 변경하여 체크
+    var isAdmin = (admins.indexOf(sender) > -1 || sender === "관리자");
 
-    // 2. 가입 여부 체크 (중요: 이 코드가 있어야 아래에서 에러가 안 납니다)
     var path = "sdcard/msgbot/Bots/sub/data/" + sender + ".json";
     var isRegistered = java.io.File(path).exists();
 
-    // [최종 관리자 전용 명령어]
-    if (isMaster) {
+    // 2. 미가입 유저의 첫 대화 감지 및 가입 절차
+    if (!isRegistered) {
+        if (msg === ".가입") {
+            UserDB.get(sender);
+            var success = "🎊 [ 소환사 등록 성공 ]\n";
+            success += "━━━━━━━━━━━━━━\n";
+            success += sender + "님, 데이터 생성이 완료되었습니다!\n\n";
+            success += "📜 '.메뉴'를 입력하여 기능을 확인하세요.";
+            replier.reply(success);
+            return;
+        }
+
+        // 환영 문구 수정: '턴제' -> '매일'
+        var welcome = "⚔️ [ 소환사의 협곡에 오신것을 환영합니다 ]\n";
+        welcome += "━━━━━━━━━━━━━━\n";
+        welcome += "반갑습니다, " + sender + "님!\n";
+        welcome += "이곳은 매일 결투가 진행되는 소환사들의 리그입니다.\n\n";
+        welcome += "👉 게임 참여를 위해 [.가입]을 입력해주세요!";
+        replier.reply(welcome);
+        return;
+    }
+
+    // 3. 관리자 전용 명령어 (시스템>관리자 전용)
+    if (isAdmin && sender === "시스템>관리자") {
         if (msg.startsWith(".권한부여 ")) {
             var target = msg.replace(".권한부여 ", "").trim();
-            if (AdminDB.add(target)) replier.reply("✅ [" + target + "]님에게 관리자 권한을 부여했습니다.");
-            else replier.reply("⚠️ 이미 관리자이거나 오류가 발생했습니다.");
-            return;
-        }
-        if (msg.startsWith(".권한해제 ")) {
-            var target = msg.replace(".권한해제 ", "").trim();
-            if (AdminDB.remove(target)) replier.reply("✅ [" + target + "]님의 관리자 권한을 해제했습니다.");
-            else replier.reply("❌ 해제할 수 없는 대상입니다.");
+            if (AdminDB.add(target)) replier.reply("✅ [" + target + "]님에게 권한을 부여했습니다.");
             return;
         }
     }
 
-    // [관리자 공통 메뉴]
-    if (isAdmin) {
-        if (msg === ".관리자메뉴") {
-            var m = "🛠️ [ 관리자 메뉴 ]\n";
-            m += ".업데이트 - 시스템 동기화\n";
-            m += ".시스템 - 상태 점검\n";
-            if (isMaster) m += ".권한부여/해제 [닉네임]";
-            replier.reply(m);
-            return;
-        }
-    }
-
-    // [이벤트 감지: 환영 문구]
-    if (msg.includes("소환사의 협곡에 오신것을 환영합니다.")) {
-        var welcomeGuide = "📜 [ 가입 안내 ]\n━━━━━━━━━━━━━━\n새로 오신 소환사님, 반갑습니다!\n게임을 시작하려면 [.가입]을 입력해주세요.\n━━━━━━━━━━━━━━";
-        replier.reply(welcomeGuide);
+    // 4. 유저 공통 메뉴 및 명령어 (명령어 수정: .보유캐릭터 -> .캐릭터)
+    if (msg === ".메뉴" || msg === ".도움말") {
+        var menu = "🎮 [ 메인 메뉴 ]\n━━━━━━━━━━━━━━\n";
+        menu += "1️⃣ 내 정보 ➔ .정보\n";
+        menu += "2️⃣ 캐릭터 ➔ .캐릭터\n"; // 메뉴 문구 및 명령어 수정
+        menu += "3️⃣ 일일 보상 ➔ .출석\n";
+        menu += "━━━━━━━━━━━━━━";
+        replier.reply(menu);
         return;
     }
 
-    // [명령어: .가입]
-    if (msg === ".가입") {
-        if (isRegistered) {
-            replier.reply("⚠️ 이미 등록된 소환사입니다.");
-            return;
-        }
-        UserDB.get(sender); 
-        replier.reply("🎊 [" + sender + "]님 등록 성공! '.메뉴'를 입력하세요.");
-        return;
-    }
-
-    // [미가입자 차단] - 관리자는 차단하지 않음
-    if (!isRegistered && !isAdmin) {
-        if (msg.startsWith(".")) {
-            replier.reply("👋 아직 등록되지 않은 소환사입니다.\n'.가입'을 먼저 진행해주세요!");
-        }
-        return;
-    }
-
-    // [가입 유저 전용 메뉴]
-    if (isRegistered) {
+    if (msg === ".정보") {
         var user = UserDB.get(sender);
-        if (msg === ".메뉴" || msg === ".도움말") {
-            replier.reply("🎮 [ 메인 메뉴 ]\n━━━━━━━━━━━━━━\n1️⃣ 내 정보 ➔ .정보\n2️⃣ 캐릭터 ➔ .보유캐릭터\n3️⃣ 일일 보상 ➔ .출석");
-            return;
-        }
-        if (msg === ".정보") {
-            var total = user.win + user.loss;
-            var rate = total === 0 ? 0 : ((user.win / total) * 100).toFixed(1);
-            replier.reply("👤 [" + user.name + " 정보]\n⭐ Lv." + user.level + " / 💰 " + user.money.toLocaleString() + " G\n📊 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)");
-            return;
-        }
+        var total = user.win + user.loss;
+        var rate = total === 0 ? 0 : ((user.win / total) * 100).toFixed(1);
+        replier.reply("👤 [" + user.name + " 정보]\n⭐ Lv." + user.level + " / 💰 " + user.money.toLocaleString() + " G\n📊 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)");
+        return;
+    }
+
+    // 명령어 수정에 따른 처리
+    if (msg === ".캐릭터") {
+        // 기존의 보유 캐릭터 조회 로직 실행
+        replier.reply("⚔️ 보유하신 캐릭터 목록을 불러옵니다... (기능 연결 중)");
+        return;
+    }
+
+    if (msg === ".출석") {
+        var user = UserDB.get(sender);
+        user.money += 100;
+        UserDB.save(sender, user);
+        replier.reply("🎁 출석 보상 100G 지급!\n(현재 자산: " + user.money.toLocaleString() + "G)");
+        return;
     }
 };
 
