@@ -59,16 +59,26 @@ Handler.process = function(msg, sender, replier) {
         return;
     }
 
+
     if (msg === ".정보") {
+        var user = UserDB.get(sender);
         var total = user.win + user.loss;
         var rate = total === 0 ? 0 : ((user.win / total) * 100).toFixed(1);
+        
+        // 경험치 퍼센트 계산
+        var expPercent = Math.floor((user.exp / user.maxExp) * 100);
+        
         var info = "👤 [" + user.name + " 정보]\n";
         if (isAdmin) info += "🎖️ 권한: 관리자\n";
-        info += "⭐ Lv." + user.level + " / 💰 " + user.money.toLocaleString() + " G\n";
-        info += "📊 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)";
+        info += "⭐ Lv." + user.level + " (" + user.exp + "/" + user.maxExp + ")\n";
+        info += "📊 경험치: [" + "■".repeat(Math.floor(expPercent/10)) + "□".repeat(10 - Math.floor(expPercent/10)) + "] " + expPercent + "%\n";
+        info += "💰 자산: " + user.money.toLocaleString() + " G\n";
+        info += "⚔️ 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)";
+        
         replier.reply(info);
         return;
     }
+
 
     if (msg === ".캐릭터") {
         replier.reply("⚔️ " + user.name + "님의 캐릭터 인벤토리입니다.\n(보유한 캐릭터 목록 표시 준비중)");
