@@ -7,7 +7,7 @@ const Handler = {};
 Handler.process = function(msg, sender, replier) {
     // 1. 권한 체크
     var admins = AdminDB.getAdmins();
-    var isMaster = (sender === "시스템"); 
+    var isMaster = (sender === "관리자"); 
     var isAdmin = (admins.indexOf(sender) > -1);
 
     // 2. 가입 여부 체크 (중요: 이 코드가 있어야 아래에서 에러가 안 납니다)
