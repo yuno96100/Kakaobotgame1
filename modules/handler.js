@@ -48,36 +48,67 @@ Handler.process = function(msg, sender, replier) {
         }
     }
 
-    // 유저 공통 메뉴
-    if (msg === ".메뉴" || msg === ".도움말") {
-        var menu = "🎮 [ 메인 메뉴 ]\n━━━━━━━━━━━━━━\n";
-        menu += "1️⃣ 내 정보 ➔ .정보\n";
-        menu += "2️⃣ 캐릭터 ➔ .캐릭터\n";
-        menu += "3️⃣ 일일 보상 ➔ .출석\n";
-        menu += "━━━━━━━━━━━━━━";
+   // ... (상단 모듈 로드 부분 생략) ...
+
+    // [명령어: .메뉴] - 깔끔한 버전
+    if (msg === ".메뉴") {
+        var menu = "🎮 [ 메인 메뉴 ]\n";
+        menu += "━━━━━━━━━━━━━━\n";
+        menu += "1️⃣ 내 정보 확인\n";
+        menu += "2️⃣ 캐릭터 인벤토리\n";
+        menu += "3️⃣ 일일 출석 보상\n";
+        menu += "━━━━━━━━━━━━━━\n";
+        menu += "💡 상세 도움말은 [.도움말] 입력";
         replier.reply(menu);
         return;
     }
 
+    // [명령어: .도움말] - 상세 안내 버전
+    if (msg === ".도움말") {
+        var help = "📜 [ 전체 도움말 안내 ]\n";
+        help += "━━━━━━━━━━━━━━\n";
+        help += "👤 [.정보] - 나의 레벨, 전적, 자산 확인\n";
+        help += "⚔️ [.캐릭터] - 내가 보유한 캐릭터 목록\n";
+        help += "🎁 [.출석] - 매일 100G와 경험치 획득\n";
+        help += "━━━━━━━━━━━━━━\n";
+        if (isAdmin) {
+            help += "🛠️ [ 관리자 명령어 ]\n";
+            help += "• .업데이트 - 최신 코드 동기화\n";
+            help += "• .시스템 - 서버 상태 점검\n";
+            help += "• .권한부여 [닉네임] - 관리자 추가\n";
+            help += "━━━━━━━━━━━━━━";
+        }
+        replier.reply(help);
+        return;
+    }
 
+    
     if (msg === ".정보") {
         var user = UserDB.get(sender);
         var total = user.win + user.loss;
         var rate = total === 0 ? 0 : ((user.win / total) * 100).toFixed(1);
         
-        // 경험치 퍼센트 계산
-        var expPercent = Math.floor((user.exp / user.maxExp) * 100);
+        var maxExp = user.maxExp || 100;
+        var currentExp = user.exp || 0;
+        var expPercent = Math.floor((currentExp / maxExp) * 100);
+        var barCount = Math.floor(expPercent / 10);
+        var expBar = "■".repeat(barCount) + "□".repeat(10 - barCount);
         
-        var info = "👤 [" + user.name + " 정보]\n";
+        var info = "📜 [ 소환사 정보 ]\n";
+        info += "━━━━━━━━━━━━━━\n";
+        info += "👤 닉네임: " + user.name + "\n";
         if (isAdmin) info += "🎖️ 권한: 관리자\n";
-        info += "⭐ Lv." + user.level + " (" + user.exp + "/" + user.maxExp + ")\n";
-        info += "📊 경험치: [" + "■".repeat(Math.floor(expPercent/10)) + "□".repeat(10 - Math.floor(expPercent/10)) + "] " + expPercent + "%\n";
-        info += "💰 자산: " + user.money.toLocaleString() + " G\n";
-        info += "⚔️ 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)";
+        info += "⭐ 레벨: Lv." + user.level + "\n";
+        info += "📊 경험치: [" + expBar + "] " + expPercent + "%\n";
+        info += "💰 보유 골드: " + user.money.toLocaleString() + " G\n";
+        info += "⚔️ 전적: " + user.win + "승 " + user.loss + "패 (" + rate + "%)\n";
+        info += "━━━━━━━━━━━━━━";
         
         replier.reply(info);
         return;
     }
+
+---------------------------------------------------------------------------------------------------
 
 
     if (msg === ".캐릭터") {
