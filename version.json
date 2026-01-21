@@ -1,6 +1,6 @@
 {
-  "version": "1.0.2",
-  "updateNote": "모듈화 시스템 도입",
+  "version": "1.0.3",
+  "updateNote": "가입절차 및 메뉴, 내정보 추가",
   "date": "2026-01-21",
   "files": [
     "main.js",
