@@ -1,10 +1,11 @@
 {
   "version": "1.0.3",
-  "updateNote": "가입절차 및 메뉴, 내정보 추가",
+  "updateNote": "가입절차 및 메뉴, 내정보, 캐릭터DB 추가",
   "date": "2026-01-21",
   "files": [
     "main.js",
     "modules/user.js",
-    "modules/handler.js"
+    "modules/handler.js",
+    "modules/champions.js"
   ]
 }
