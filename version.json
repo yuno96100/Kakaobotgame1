@@ -1,11 +1,11 @@
 {
-  "version": "1.0.6",
-  "updateNote": "기존유저 데이터 업데이트",
-  "date": "2026-01-22",
+  "version": "1.0.7",
+  "updateNote": "관리자 모듈 추가 및 경로 오류 수정",
   "files": [
     "main.js",
-    "modules/user.js",
     "modules/handler.js",
-    "modules/champions.js"
+    "modules/user.js",
+    "modules/champions.js",
+    "modules/admin.js" 
   ]
 }
