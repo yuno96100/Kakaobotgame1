@@ -124,82 +124,50 @@ Handler.process = function(msg, sender, replier) {
     }
 
 
+
     // ------ [ 6. 관리자 전용 명령어 섹션 ] ------
     if (isAdmin && isMaster) {
-        
-        // [특정 유저 초기화] 명령어: .초기화 [닉네임]
-        if (msg.startsWith(".초기화 ")) {
-            var target = msg.replace(".초기화 ", "").trim();
-            var targetPath = "sdcard/msgbot/Bots/sub/data/" + target + ".json";
-            
-            if (java.io.File(targetPath).exists()) {
-                // 초기 데이터 정의
-                var resetData = {
-                    name: target,
-                    level: 1,
-                    exp: 0,
-                    maxExp: 100,
-                    money: 1000,
-                    win: 0,
-                    loss: 0,
-                    ownedChars: [101],
-                    lastAttendance: ""
-                };
-                UserDB.save(target, resetData);
-                replier.reply("⚠️ [데이터 리셋]\n[" + target + "]님의 정보를 초기 상태로 변경했습니다.");
-            } else {
-                replier.reply("❌ 해당 유저를 찾을 수 없습니다.");
-            }
-            return;
-        }
 
-        // [데이터 전체 백업] 명령어: .백업
-        if (msg === ".백업") {
-            try {
-                var sourceFolder = new java.io.File("sdcard/msgbot/Bots/sub/data/");
-                var backupFolder = new java.io.File("sdcard/msgbot/Bots/sub/backup/");
-                if (!backupFolder.exists()) backupFolder.mkdirs();
-
-                var files = sourceFolder.listFiles();
-                for (var i = 0; i < files.length; i++) {
-                    if (files[i].isFile()) {
-                        var content = FileStream.read(files[i].getAbsolutePath());
-                        FileStream.write("sdcard/msgbot/Bots/sub/backup/" + files[i].getName(), content);
-                    }
-                }
-                replier.reply("💾 [백업 완료]\n모든 데이터가 backup 폴더에 저장되었습니다.");
-            } catch (e) {
-                replier.reply("❌ 백업 실패: " + e.message);
-            }
-            return;
-        }
-
-        // [데이터 복구] 명령어: .복구
-        if (msg === ".복구 확인") {
+        // [백업 데이터 목록 확인] 명령어: .백업목록
+        if (msg === ".백업목록") {
             try {
                 var backupFolder = new java.io.File("sdcard/msgbot/Bots/sub/backup/");
-                if (!backupFolder.exists()) {
-                    replier.reply("❌ 백업된 데이터가 없습니다.");
+                if (!backupFolder.exists() || backupFolder.listFiles().length === 0) {
+                    replier.reply("📂 [백업 현황]\n━━━━━━━━━━━━━━\n저장된 백업 데이터가 없습니다.");
                     return;
                 }
+
                 var files = backupFolder.listFiles();
+                var list = [];
+                var lastTime = 0;
+
                 for (var i = 0; i < files.length; i++) {
-                    var content = FileStream.read(files[i].getAbsolutePath());
-                    FileStream.write("sdcard/msgbot/Bots/sub/data/" + files[i].getName(), content);
+                    if (files[i].isFile() && files[i].getName().endsWith(".json")) {
+                        // 관리자 파일 제외하고 유저 이름만 추출
+                        if (files[i].getName() !== "admins.json") {
+                            list.push(files[i].getName().replace(".json", ""));
+                        }
+                        // 가장 최근 수정 시간 파악
+                        if (files[i].lastModified() > lastTime) lastTime = files[i].lastModified();
+                    }
                 }
-                replier.reply("✅ [복구 완료]\n백업 시점의 데이터로 모두 복구되었습니다.");
+
+                var date = new Date(lastTime);
+                var timeStr = (date.getMonth() + 1) + "/" + date.getDate() + " " + date.getHours() + ":" + date.getMinutes();
+
+                var res = "📂 [ 백업 데이터 확인 ]\n";
+                res += "━━━━━━━━━━━━━━\n";
+                res += "⏰ 최근 백업: " + timeStr + "\n";
+                res += "👤 대상: " + list.length + "명의 소환사\n";
+                res += "📋 명단: " + (list.length > 10 ? list.slice(0, 10).join(", ") + " 외..." : list.join(", ")) + "\n";
+                res += "━━━━━━━━━━━━━━\n";
+                res += "💡 복구하려면 [.복구 확인] 입력";
+                replier.reply(res);
             } catch (e) {
-                replier.reply("❌ 복구 실패: " + e.message);
+                replier.reply("❌ 목록 조회 실패: " + e.message);
             }
             return;
         }
 
-        if (msg.startsWith(".권한부여 ")) {
-            var target = msg.replace(".권한부여 ", "").trim();
-            if (AdminDB.add(target)) replier.reply("✅ [" + target + "]님에게 권한을 부여했습니다.");
-            return;
-        }
+        // ... (이전의 .백업, .복구 확인, .초기화 코드들) ...
     }
-};
-
-module.exports = Handler;
