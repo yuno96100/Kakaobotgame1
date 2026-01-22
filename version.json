@@ -1,7 +1,8 @@
 {
-  "version": "1.2.2",
+  "version": "1.2.3",
   "updateNote": "전체 섹션 구조화 및 모듈 안정화\n- [Structure] SECTION 1(가입), 2(유저), 3(관리자)으로 명확히 구분\n- [Fix] module.exports = Handler; 누락 수정 완료\n- [UI] 이모지 및 구분선을 활용한 가독성 강화\n- [Guide] '매일', '캐릭터', '관리자' 명칭 가이드 100% 준수",
   "files": [
-    "modules/handler.js"
+    "modules/handler.js",
+    "main.js"
   ]
 }
