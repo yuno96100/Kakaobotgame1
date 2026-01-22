@@ -1,63 +1,47 @@
 const USER_PATH = "sdcard/msgbot/Bots/sub/data/";
-
 const UserDB = {};
 
-// [보강] 레벨업 체크 함수
-UserDB.checkLevelUp = function(userData) {
-    var leveledUp = false;
-    while (userData.exp >= userData.maxExp) {
-        userData.exp -= userData.maxExp;
-        userData.level++;
-        userData.maxExp = Math.floor(userData.maxExp * 1.2); // 레벨당 필요 경험치 20% 증가
-        leveledUp = true;
-    }
-    return leveledUp;
-};
-
+// [최적화] 데이터 로드 시 방어 로직 강화
 UserDB.get = function(name) {
     try {
         var file = new java.io.File(USER_PATH + name + ".json");
         var userData;
 
         if (!file.exists()) {
-            var folder = new java.io.File(USER_PATH);
-            if (!folder.exists()) folder.mkdirs();
-
-            userData = {
-                name: name,
-                level: 1,
-                exp: 0,
-                maxExp: 100,
-                money: 1000,
-                win: 0,
-                loss: 0,
-                ownedChars: [101],
-                lastAttendance: ""
+            userData = { 
+                name: name, level: 1, exp: 0, maxExp: 100, money: 1000, 
+                win: 0, loss: 0, ownedChars: [101], lastAttendance: "" 
             };
             this.save(name, userData);
         } else {
-            userData = JSON.parse(FileStream.read(USER_PATH + name + ".json"));
+            var content = FileStream.read(USER_PATH + name + ".json");
+            if (!content) throw new Error("파일 내용이 비어있음");
+            userData = JSON.parse(content);
             
-            // 필드 자동 보정 (Schema 보정)
-            var updated = false;
-            if (userData.exp === undefined) { userData.exp = 0; updated = true; }
-            if (userData.maxExp === undefined) { userData.maxExp = 100; updated = true; }
-            if (userData.lastAttendance === undefined) { userData.lastAttendance = ""; updated = true; }
-            
-            if (updated) this.save(name, userData);
+            // 필드 누락 보정 (최적화)
+            var defaults = { exp: 0, maxExp: 100, money: 1000, lastAttendance: "" };
+            var isUpdated = false;
+            for (var key in defaults) {
+                if (userData[key] === undefined) {
+                    userData[key] = defaults[key];
+                    isUpdated = true;
+                }
+            }
+            if (isUpdated) this.save(name, userData);
         }
         return userData;
     } catch (e) {
-        Log.error(name + " 데이터 로드 실패: " + e.message);
+        // 에러 발생 시 로그를 남기고 기본값 반환하여 봇 멈춤 방지
+        Log.error("[" + name + "] 데이터 로드 실패: " + e.message);
         return null;
     }
 };
 
 UserDB.save = function(name, data) {
     try {
-        FileStream.write(USER_PATH + name + ".json", JSON.stringify(data));
+        FileStream.write(USER_PATH + name + ".json", JSON.stringify(data, null, 2));
     } catch (e) {
-        Log.error(name + " 데이터 저장 실패: " + e.message);
+        Log.error("[" + name + "] 데이터 저장 실패: " + e.message);
     }
 };
 
