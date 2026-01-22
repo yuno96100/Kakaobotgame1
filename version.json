@@ -1,6 +1,6 @@
 {
-  "version": "2.4.1",
-  "updateNote": "SessionCacheReplier 객체 참조 오류 해결\n- [Fix] replier.trim() 호출 에러 수정을 위해 senderName 변수 분리 및 정제\n- [Fix] 인자 전달 순서 재검증 및 try-catch 라인 표시 기능 추가\n- [Restoration] V1.2.2 기반의 모든 관리자/유저 기능 생략 없이 유지\n- [Naming] 가이드에 따라 '매일', '캐릭터', '관리자' 명칭 고정",
+  "version": "2.4.2",
+  "updateNote": "replier undefined 에러 완벽 해결\n- [Fix] main.js와 handler.js 간의 5개 인자 전달 순서 동기화\n- [Fix] 핸들러 내부에서 replier 유효성 검사 로직 추가\n- [Restoration] V1.2.2 기반의 연동 없는 즉시 가입 및 관리자 도구 전체 복구\n- [Naming] 관리자 '관리자', 환영문구 '매일', 캐릭터 메뉴 '캐릭터' 명칭 준수",
   "files": [
     "main.js",
     "modules/handler.js"
