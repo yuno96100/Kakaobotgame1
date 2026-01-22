@@ -1,6 +1,6 @@
 {
-  "version": "2.4.2",
-  "updateNote": "replier undefined 에러 완벽 해결\n- [Fix] main.js와 handler.js 간의 5개 인자 전달 순서 동기화\n- [Fix] 핸들러 내부에서 replier 유효성 검사 로직 추가\n- [Restoration] V1.2.2 기반의 연동 없는 즉시 가입 및 관리자 도구 전체 복구\n- [Naming] 관리자 '관리자', 환영문구 '매일', 캐릭터 메뉴 '캐릭터' 명칭 준수",
+  "version": "1.2.2-Final",
+  "updateNote": "핸들러 파일의 누락된 코드 복구 및 전체 검증 완료\n- [Fix] handler.js 끝 부분의 중괄호(}) 누락 해결\n- [System] 연동 없는 즉시 가입 시스템 V1.2.2 원본 로직 적용\n- [Admin] 관리자 '관리자' 즉시 인식 및 제어 도구 전체 포함\n- [UI] '매일', '캐릭터', '관리자' 명칭 가이드 100% 준수",
   "files": [
     "main.js",
     "modules/handler.js"
