@@ -1,12 +1,14 @@
+// sdcard/msgbot/Bots/sub/main.js
 const Handler = require("./modules/handler");
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    /**
-     * V1.2.2 시스템 입구
-     * 모든 명령어는 마침표(.)로 시작할 때만 핸들러로 전달됩니다.
-     */
     if (msg.startsWith(".")) {
-        // [순서] 방이름, 메시지, 보낸사람, 단체채팅여부, 답장도구
-        Handler.process(room, msg, sender, isGroupChat, replier);
+        try {
+            // 명령어가 들어오면 핸들러 실행
+            Handler.process(room, msg, sender, isGroupChat, replier);
+        } catch (e) {
+            // 에러 발생 시 채팅방에 에러 내용을 알림
+            replier.reply("❌ 핸들러 실행 오류: " + e.message);
+        }
     }
 }
