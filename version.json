@@ -1,8 +1,8 @@
 {
-  "version": "1.9.2",
-  "updateNote": "인자 전달 불일치로 인한 런타임 에러(Undefined replier) 긴급 수정\n- main.js와 handler.js 간의 파라미터 매핑 동기화 안내\n- Handler.process 호출 시 5개 인자(room, msg, sender, isGroupChat, replier) 필수 전달 확인",
+  "version": "1.9.3",
+  "updateNote": "모듈 경로 및 인자 전달(Parameter Passing) 구조 정정\n- 업데이트 노트 내 핸들러 경로 오류 수정: modules/handler.js\n- Undefined replier 에러 방지를 위한 main.js 호출부 구조 강제 동기화\n- 가독성 패치가 적용된 Handler.process 함수 전체 로직 검증",
   "files": [
     "main.js",
-    "handler.js"
+    "modules/handler.js"
   ]
 }
