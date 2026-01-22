@@ -1,7 +1,11 @@
 {
-  "version": "1.2.5",
-  "updateNote": "핸들러 섹션 최적화 및 내보내기 코드 복구\n- [Fix] module.exports = Handler; 구문 명시적 추가\n- [Structure] 가이드에 따라 가입/매일메뉴/관리자 섹션 3단계 분리\n- [Admin] 관리자추가/제거 기능을 AdminDB 모듈과 연동 완료\n- [Naming] 관리자 '관리자', 환영문구 '매일', 캐릭터 메뉴 '캐릭터' 명칭 준수",
+  "version": "1.2.6",
+  "updateNote": "무반응 오류 해결 및 관리자/유저 가이드 명칭 전면 적용\n- [System] 전체 모듈 경로를 절대 경로(/sdcard/...)로 수정하여 로딩 최적화\n- [Fix] handler.js 하단 module.exports 누락 및 중괄호 오타 수정\n- [Structure] 가이드에 따라 가입/매일메뉴/관리자 섹션 3단계 완전 분리\n- [Admin] 관리자 이름을 '관리자'로 변경하고 전용 권한 로직 강화\n- [User] 환영 문구 내 '턴제'를 '매일'로, 메뉴/명령어를 '.캐릭터'로 변경 완료",
   "files": [
-    "modules/handler.js"
+    "main.js",
+    "modules/handler.js",
+    "modules/user.js",
+    "modules/admin.js",
+    "modules/version.json"
   ]
 }
