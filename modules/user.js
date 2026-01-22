@@ -1,51 +1,37 @@
-const USER_PATH = "sdcard/msgbot/Bots/sub/data/";
-const UserCache = {}; 
 const UserDB = {};
+const cache = {};
 
 UserDB.get = function(name) {
-    if (UserCache[name]) return UserCache[name];
-    try {
-        var file = new java.io.File(USER_PATH + name + ".json");
-        var userData;
-        if (!file.exists()) {
-            // ⭐ 중요: roomName 필드를 초기값에 추가합니다.
-            userData = { 
-                name: name, 
-                level: 1, 
-                exp: 0, 
-                maxExp: 100, 
-                money: 1000, 
-                win: 0, 
-                loss: 0, 
-                roomName: "", // 개인톡 방 주소 저장용
-                status: "IDLE", 
-                lastAttendance: "" 
-            };
-            this.save(name, userData);
-        } else {
-            userData = JSON.parse(FileStream.read(USER_PATH + name + ".json"));
-        }
-        UserCache[name] = userData;
-        return userData;
-    } catch (e) { return null; }
+    if (cache[name]) return cache[name];
+    var path = "sdcard/msgbot/Bots/sub/data/" + name + ".json";
+    if (java.io.File(path).exists()) {
+        var data = JSON.parse(FileStream.read(path));
+        cache[name] = data;
+        return data;
+    }
+    return { name: name, level: 1, exp: 0, maxExp: 100, money: 1000, win: 0, loss: 0, roomName: "", lastAttendance: "" };
 };
 
 UserDB.save = function(name, data) {
-    UserCache[name] = data;
-    FileStream.write(USER_PATH + name + ".json", JSON.stringify(data, null, 2));
+    cache[name] = data;
+    var path = "sdcard/msgbot/Bots/sub/data/" + name + ".json";
+    var folder = new java.io.File("sdcard/msgbot/Bots/sub/data/");
+    if (!folder.exists()) folder.mkdirs();
+    FileStream.write(path, JSON.stringify(data, null, 4));
 };
 
 UserDB.checkLevelUp = function(user) {
-    var up = false;
-    while (user.exp >= user.maxExp) {
-        user.exp -= user.maxExp;
+    if (user.exp >= user.maxExp) {
         user.level++;
-        user.maxExp = Math.floor(user.maxExp * 1.2);
-        user.money += 500; // 레벨업 보너스
-        up = true;
+        user.exp -= user.maxExp;
+        user.maxExp = Math.floor(user.maxExp * 1.5);
+        return true;
     }
-    return up;
+    return false;
 };
 
-UserDB.clearCache = function() { for (var k in UserCache) delete UserCache[k]; };
+UserDB.clearCache = function() {
+    for (var key in cache) delete cache[key];
+};
+
 module.exports = UserDB;
