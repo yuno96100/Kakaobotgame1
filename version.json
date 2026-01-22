@@ -3,6 +3,7 @@
   "updateNote": "연동 최적화",
   "files": [
     "modules/user.js",
-    "main.js"
+    "main.js",
+    "modules/handler.js"
   ]
 }
