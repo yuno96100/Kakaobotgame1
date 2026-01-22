@@ -1,9 +1,9 @@
 {
-  "version": "1.9.7",
-  "updateNote": "최종 핸들러 코드 실장 안내\n- 2번 코드(handler.js)의 물리적 위치 확정 및 적용 가이드 제공\n- main.js 인자 전달 오류(Undefined) 방지를 위한 구조 최종 점검\n- 단톡방 가이드 및 개인톡 연동 로직 통합 본체 탑재",
+  "version": "1.9.8",
+  "updateNote": "Syntax Error(Invalid return) 긴급 디버깅 완료\n- 함수 스코프 외부에 존재하던 return 구문 제거 및 중괄호 정합성 확보\n- 유저 공통 메뉴 명칭 변경 반영 (보유 캐릭터 ➔ 캐릭터)\n- 매일 보상 시스템 문구 현행화\n- 관리자 원격 체크 및 개인 연동 가이드 로직 안정화",
   "files": [
-    "modules/handler.js",
     "main.js",
+    "modules/handler.js",
     "modules/user.js",
     "modules/admin.js"
   ]
