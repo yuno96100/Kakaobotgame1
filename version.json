@@ -1,6 +1,6 @@
 {
-  "version": "1.2.2-Fix",
-  "updateNote": "V1.2.2 버전 응답 없음 오류 수정\n- [Admin] 관리자 판정 시 .trim() 추가로 이름 불일치 문제 해결\n- [Logic] 모든 응답에 return을 추가하여 함수 중첩 실행 방지\n- [Error] main.js에 try-catch 추가로 내부 에러 실시간 채팅창 확인 가능\n- [Menu] '매일', '캐릭터', '관리자' 명칭 가이드 100% 준수",
+  "version": "2.4.1",
+  "updateNote": "SessionCacheReplier 객체 참조 오류 해결\n- [Fix] replier.trim() 호출 에러 수정을 위해 senderName 변수 분리 및 정제\n- [Fix] 인자 전달 순서 재검증 및 try-catch 라인 표시 기능 추가\n- [Restoration] V1.2.2 기반의 모든 관리자/유저 기능 생략 없이 유지\n- [Naming] 가이드에 따라 '매일', '캐릭터', '관리자' 명칭 고정",
   "files": [
     "main.js",
     "modules/handler.js"
