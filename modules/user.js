@@ -8,7 +8,19 @@ UserDB.get = function(name) {
         var file = new java.io.File(USER_PATH + name + ".json");
         var userData;
         if (!file.exists()) {
-            userData = { name: name, level: 1, exp: 0, maxExp: 100, money: 1000, win: 0, loss: 0, ownedChars: [101], lastAttendance: "" };
+            // ⭐ 중요: roomName 필드를 초기값에 추가합니다.
+            userData = { 
+                name: name, 
+                level: 1, 
+                exp: 0, 
+                maxExp: 100, 
+                money: 1000, 
+                win: 0, 
+                loss: 0, 
+                roomName: "", // 개인톡 방 주소 저장용
+                status: "IDLE", 
+                lastAttendance: "" 
+            };
             this.save(name, userData);
         } else {
             userData = JSON.parse(FileStream.read(USER_PATH + name + ".json"));
@@ -29,7 +41,7 @@ UserDB.checkLevelUp = function(user) {
         user.exp -= user.maxExp;
         user.level++;
         user.maxExp = Math.floor(user.maxExp * 1.2);
-        user.money += 500;
+        user.money += 500; // 레벨업 보너스
         up = true;
     }
     return up;
