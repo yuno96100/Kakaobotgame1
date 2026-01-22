@@ -1,40 +1,35 @@
-const UserDB = require("./user"); // 위에서 만든 유저 모듈 불러오기
+const UserDB = require("./user");
 
 const Handler = {};
 
 Handler.process = function(msg, sender, replier) {
-    // 모든 명령어 처리 전에 유저 데이터를 불러옵니다.
     var user = UserDB.get(sender);
 
-    // 1. 도움말 명령어
-    if (msg === ".도움말") {
-        var help = "🎮 [ 게임 봇 도움말 ]\n";
-        help += "━━━━━━━━━━━━━━\n";
-        help += ".정보 - 내 스탯 및 보유 골드 확인\n";
-        help += ".출석 - 매일 50골드 보상 받기\n";
-        help += ".강화 - 골드를 써서 레벨업 (미구현)\n";
-        help += "━━━━━━━━━━━━━━";
-        replier.reply(help);
-        return;
-    }
-
-    // 2. 내 정보 확인
+    // .정보 명령어 처리
     if (msg === ".정보") {
-        var info = "👤 [" + sender + "님의 정보]\n";
-        info += "⭐ 레벨: " + user.level + "\n";
-        info += "💰 골드: " + user.gold + " G\n";
-        info += "❤️ 체력: " + user.hp + " / 100\n";
-        info += "📊 경험치: " + user.exp;
+        // 승률 계산 로직 (0판일 경우 대비)
+        var totalGames = user.win + user.loss;
+        var winRate = totalGames === 0 ? 0 : ((user.win / totalGames) * 100).toFixed(1);
+
+        var info = "👤 [ " + user.name + "님의 소환사 정보 ]\n";
+        info += "━━━━━━━━━━━━━━\n";
+        info += "🏅 칭호: " + user.title + "\n";
+        info += "⭐ 계정 레벨: Lv." + user.level + "\n";
+        info += "💰 보유 재화: " + user.money.toLocaleString() + " G\n";
+        info += "📊 전적: " + user.win + "승 " + user.loss + "패 (승률: " + winRate + "%)\n";
+        info += "⚔️ 보유 캐릭터: [" + user.ownedChars.join(", ") + "]\n";
+        info += "━━━━━━━━━━━━━━";
+        
         replier.reply(info);
         return;
     }
 
-    // 3. 출석 체크 (간단한 로직)
-    if (msg === ".출석") {
-        user.gold += 50;
-        user.exp += 10;
-        UserDB.save(sender, user); // 데이터 파일 저장
-        replier.reply("🎊 출석 완료! 50골드와 경험치 10을 획득했습니다.\n(현재 골드: " + user.gold + "G)");
+    // .도움말 명령어
+    if (msg === ".도움말") {
+        var help = "📜 [ 게임 도움말 ]\n";
+        help += ".정보 - 내 프로필 확인\n";
+        help += ".출석 - 일일 보상 획득\n";
+        replier.reply(help);
         return;
     }
 };
