@@ -1,11 +1,10 @@
 const ADMIN_PATH = "sdcard/msgbot/Bots/sub/data/admins.json";
-
 const AdminDB = {};
 
 AdminDB.getAdmins = function() {
     try {
         if (!java.io.File(ADMIN_PATH).exists()) {
-            var initial = ["관리자"]; // 기본 관리자 설정
+            var initial = ["관리자"];
             var folder = new java.io.File("sdcard/msgbot/Bots/sub/data/");
             if (!folder.exists()) folder.mkdirs();
             FileStream.write(ADMIN_PATH, JSON.stringify(initial));
