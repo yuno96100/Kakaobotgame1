@@ -1,15 +1,21 @@
-// /sdcard/msgbot/Bots/sub/main.js
-const Handler = require("./modules/handler");
+// sdcard/msgbot/Bots/sub/main.js
+try {
+    var Handler = require("./modules/handler");
+    Log.info("✅ 핸들러 로딩 성공");
+} catch (e) {
+    Log.error("❌ 핸들러 로딩 실패: " + e.message);
+}
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
     if (msg.startsWith(".")) {
         try {
-            // V1.2.2 표준 인자 전달
-            Handler.process(room, msg, sender, isGroupChat, replier);
+            if (typeof Handler !== "undefined" && Handler.process) {
+                Handler.process(room, msg, sender, isGroupChat, replier);
+            } else {
+                replier.reply("⚠️ 시스템 준비 중입니다. 잠시 후 다시 시도해주세요.");
+            }
         } catch (e) {
-            // 에러 발생 시 로그 탭과 채팅창에 동시에 출력
-            Log.error(e.message + "\n" + e.stack);
-            replier.reply("❌ 시스템 오류 발생: " + e.message);
+            replier.reply("❌ 실행 오류: " + e.message);
         }
     }
 }
