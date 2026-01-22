@@ -1,32 +1,28 @@
-// sdcard/msgbot/Bots/sub/main.js
+// /sdcard/msgbot/Bots/sub/main.js
 var Handler;
 
-function loadModule() {
+function load() {
     try {
-        // 경로 문제를 방지하기 위해 캐시를 삭제하고 다시 불러옵니다.
-        delete require.cache[require.resolve("./modules/handler")];
         Handler = require("./modules/handler");
-        Log.info("✅ 핸들러 로딩 성공");
+        Log.info("✅ 핸들러 로딩 완료");
     } catch (e) {
-        Log.error("❌ 로딩 실패: " + e.message + "\n라인: " + e.lineNumber);
+        Log.error("❌ 로딩 에러: " + e.message);
     }
 }
 
-// 봇 시작 시 실행
-loadModule();
+load(); // 시작 시 로드
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    // 봇 상태 체크용 (명령어 앞에 점이 없어도 반응하는지 확인)
-    if (msg === "봇") return replier.reply("온라인");
+    if (msg === ".리로드" && sender.toString() === "관리자") {
+        load();
+        return replier.reply("🔄 시스템이 재시작되었습니다.");
+    }
 
     if (msg.startsWith(".")) {
-        if (!Handler) loadModule(); // 로딩 안 되어있으면 재시도
-        
         try {
             Handler.process(room, msg, sender, isGroupChat, replier);
         } catch (e) {
-            replier.reply("❌ 실행 오류: " + e.message);
-            Log.error("실행 오류: " + e.stack);
+            replier.reply("❌ 실행 에러: " + e.message);
         }
     }
 }
