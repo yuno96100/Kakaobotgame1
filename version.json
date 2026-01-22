@@ -1,10 +1,8 @@
 {
-  "version": "1.8.9",
-  "updateNote": "연동 최적화",
+  "version": "1.9.2",
+  "updateNote": "인자 전달 불일치로 인한 런타임 에러(Undefined replier) 긴급 수정\n- main.js와 handler.js 간의 파라미터 매핑 동기화 안내\n- Handler.process 호출 시 5개 인자(room, msg, sender, isGroupChat, replier) 필수 전달 확인",
   "files": [
-    "modules/user.js",
     "main.js",
-    "modules/handler.js",
-    "modules/admin.js"
+    "handler.js"
   ]
 }
