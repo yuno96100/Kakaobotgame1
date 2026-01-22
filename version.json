@@ -6,6 +6,6 @@
     "modules/handler.js",
     "modules/user.js",
     "modules/admin.js",
-    "modules/version.json"
+    "version.json"
   ]
 }
