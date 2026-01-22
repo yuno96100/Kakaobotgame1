@@ -4,37 +4,35 @@ const AdminDB = require("./admin");
 const Handler = {};
 
 Handler.process = function(room, msg, sender, isGroupChat, replier) {
-    // 1. 관리자 명단 로드 (이름이 '관리자'면 무조건 pass)
+    // [수정] sender(이름)에만 trim을 사용하여 replier와의 충돌 방지
+    var senderName = sender.toString().trim();
     var admins = AdminDB.getAdmins();
-    var isAdmin = (sender.trim() === "관리자" || admins.indexOf(sender.trim()) > -1);
+    var isAdmin = (senderName === "관리자" || admins.indexOf(senderName) > -1);
     
-    // 2. 가입 여부 확인 (경로 재검증)
-    var dataPath = "sdcard/msgbot/Bots/sub/data/" + sender + ".json";
+    var dataPath = "sdcard/msgbot/Bots/sub/data/" + senderName + ".json";
     var isRegistered = java.io.File(dataPath).exists();
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // [ 가입 로직 ] - .가입 입력 시 반응 확인용
+    // [ 1. 가입 로직 ]
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     if (msg === ".가입") {
         if (isRegistered) {
-            return replier.reply("🔔 [" + sender + "]님은 이미 등록되어 있습니다.");
+            return replier.reply("🔔 [" + senderName + "]님은 이미 등록된 소환사입니다.");
         }
-        var newUser = UserDB.get(sender); 
-        UserDB.save(sender, newUser);
-        return replier.reply("🎊 [ 가입 완료 ]\n" + sender + "님 환영합니다!\n[.메뉴]를 입력해보세요.");
+        var newUser = UserDB.get(senderName);
+        UserDB.save(senderName, newUser);
+        return replier.reply("🎊 [ 가입 완료 ]\n" + senderName + "님 환영합니다!\n이제 명령어를 사용하실 수 있습니다.");
     }
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // [ 비회원 차단 ]
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // 미가입자 제한
     if (!isRegistered) {
         return replier.reply("⚠️ [.가입]을 먼저 입력해주세요.");
     }
 
-    var user = UserDB.get(sender);
+    var user = UserDB.get(senderName);
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // [ 유저 공통 메뉴 ]
+    // [ 2. 유저 공통 메뉴 ]
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     if (msg === ".메뉴") {
         var menu = "🎮 [ 매일 메뉴 ]\n" + "━".repeat(12) + "\n1. .정보\n2. .캐릭터\n3. .출석\n" + (isAdmin ? "🛠️ .관리자명령어\n" : "") + "━".repeat(12);
@@ -44,7 +42,8 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
     if (msg === ".정보") {
         var expP = Math.floor((user.exp / user.maxExp) * 100);
         var bar = "■".repeat(Math.floor(expP/10)) + "□".repeat(10-Math.floor(expP/10));
-        return replier.reply("📜 [ " + sender + " 정보 ]\n" + "━".repeat(12) + "\n👤 닉네임: " + user.name + (isAdmin ? " (관리자)" : "") + "\n⭐ Lv." + user.level + "\n📊 EXP: [" + bar + "] " + expP + "%\n💰 골드: " + user.money.toLocaleString() + "G\n" + "━".repeat(12));
+        var info = "📜 [ " + senderName + " 정보 ]\n" + "━".repeat(12) + "\n👤 닉네임: " + user.name + (isAdmin ? " (관리자)" : "") + "\n⭐ Lv." + user.level + "\n📊 EXP: [" + bar + "] " + expP + "%\n💰 골드: " + user.money.toLocaleString() + "G\n" + "━".repeat(12);
+        return replier.reply(info);
     }
 
     if (msg === ".출석") {
@@ -52,28 +51,30 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
         if (user.lastAttendance === today) return replier.reply("🔔 오늘 이미 보상을 받았습니다.");
         user.money += 100; user.exp += 50; user.lastAttendance = today;
         UserDB.checkLevelUp(user);
-        UserDB.save(sender, user);
-        return replier.reply("🎁 [ 매일 출석 완료 ]\n보상: 100G / 50EXP");
+        UserDB.save(senderName, user);
+        return replier.reply("🎁 [ 매일 출석 완료 ]\n100G와 50EXP를 보상으로 받았습니다!");
     }
 
     if (msg === ".캐릭터") {
-        return replier.reply("⚔️ [ 캐릭터 ]\n캐릭터 목록을 준비 중입니다.");
+        return replier.reply("⚔️ [ 캐릭터 ]\n보유 중인 캐릭터 목록을 불러오는 중입니다...");
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // [ 관리자 전용 ]
+    // [ 3. 관리자 전용 기능 ]
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     if (isAdmin) {
         if (msg === ".관리자명령어") {
-            return replier.reply("🛠️ [ 관리자 도구 ]\n.관리자추가 [이름]\n.관리자제거 [이름]\n.백업\n.복구 확인\n.초기화 [이름]\n.닉네임변경 [A]>[B]\n.유저체크 [이름]");
+            var adminMenu = "🛠️ [ 관리자 시스템 ]\n• .관리자추가 [이름]\n• .관리자제거 [이름]\n• .백업\n• .복구 확인\n• .초기화 [이름]\n• .닉네임변경 [A]>[B]\n• .유저체크 [이름]";
+            return replier.reply(adminMenu);
         }
+
         if (msg.startsWith(".유저체크 ")) {
             var target = msg.replace(".유저체크 ", "").trim();
             var tData = UserDB.get(target);
-            return replier.reply("🔍 [" + target + "] 정보\nLv." + tData.level + " / " + tData.money + "G");
+            return replier.reply("🔍 [유저정보: " + target + "]\nLv." + tData.level + " / " + tData.money.toLocaleString() + "G");
         }
+
         if (msg === ".백업") {
-            // 백업 로직 생략 없이 포함 (v1.2.2 원본)
             try {
                 var src = new java.io.File("sdcard/msgbot/Bots/sub/data/");
                 var bak = new java.io.File("sdcard/msgbot/Bots/sub/backup/");
@@ -82,8 +83,40 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
                 for (var i = 0; i < files.length; i++) {
                     if (files[i].isFile()) FileStream.write("sdcard/msgbot/Bots/sub/backup/" + files[i].getName(), FileStream.read(files[i].getAbsolutePath()));
                 }
-                return replier.reply("💾 백업 완료");
-            } catch(e) { return replier.reply("❌ 백업 실패"); }
+                return replier.reply("💾 [백업] 전체 데이터 저장 완료.");
+            } catch (e) { return replier.reply("❌ 백업 실패: " + e.message); }
+        }
+
+        if (msg === ".복구 확인") {
+            try {
+                var bakDir = new java.io.File("sdcard/msgbot/Bots/sub/backup/");
+                var files = bakDir.listFiles();
+                if (!files || files.length == 0) return replier.reply("❌ 백업 파일이 없습니다.");
+                for (var i = 0; i < files.length; i++) {
+                    FileStream.write("sdcard/msgbot/Bots/sub/data/" + files[i].getName(), FileStream.read(files[i].getAbsolutePath()));
+                }
+                UserDB.clearCache();
+                return replier.reply("✅ [복구] 데이터 복원 완료.");
+            } catch (e) { return replier.reply("❌ 복구 실패: " + e.message); }
+        }
+
+        if (msg.startsWith(".닉네임변경 ")) {
+            var parts = msg.replace(".닉네임변경 ", "").split(">");
+            if (parts.length < 2) return replier.reply("❌ 형식: .닉네임변경 기존>신규");
+            var oldN = parts[0].trim(), newN = parts[1].trim();
+            var oldPath = "sdcard/msgbot/Bots/sub/data/" + oldN + ".json";
+            if (java.io.File(oldPath).exists()) {
+                FileStream.write("sdcard/msgbot/Bots/sub/data/" + newN + ".json", FileStream.read(oldPath));
+                return replier.reply("🔄 [변경] " + oldN + " ➔ " + newN + " 완료.");
+            } else {
+                return replier.reply("❌ [" + oldN + "] 유저가 없습니다.");
+            }
+        }
+
+        if (msg.startsWith(".초기화 ")) {
+            var target = msg.replace(".초기화 ", "").trim();
+            UserDB.save(target, { name: target, level: 1, exp: 0, maxExp: 100, money: 1000, win: 0, loss: 0, roomName: "", lastAttendance: "" });
+            return replier.reply("⚠️ [" + target + "] 데이터 초기화 완료.");
         }
     }
 };
