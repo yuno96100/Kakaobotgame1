@@ -1,17 +1,15 @@
+// /sdcard/msgbot/Bots/sub/main.js
 const Handler = require("./modules/handler");
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
     if (msg.startsWith(".")) {
         try {
-            // [중요] 반드시 이 순서를 지켜야 합니다: room, msg, sender, isGroupChat, replier
+            // V1.2.2 표준 인자 전달
             Handler.process(room, msg, sender, isGroupChat, replier);
         } catch (e) {
-            // replier가 살아있는지 확인 후 에러 출력
-            if (replier) {
-                replier.reply("❌ 실행 오류: " + e.message);
-            } else {
-                Log.error("핸들러 실행 오류 (replier 미정의): " + e.message);
-            }
+            // 에러 발생 시 로그 탭과 채팅창에 동시에 출력
+            Log.error(e.message + "\n" + e.stack);
+            replier.reply("❌ 시스템 오류 발생: " + e.message);
         }
     }
 }
