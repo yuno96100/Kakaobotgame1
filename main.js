@@ -1,30 +1,13 @@
-// /sdcard/msgbot/Bots/sub/main.js
-var Handler;
-
-function load() {
-    try {
-        Handler = require("./modules/handler");
-        Log.info("✅ 핸들러 로딩 완료");
-    } catch (e) {
-        Log.error("❌ 로딩 에러: " + e.message);
-    }
-}
-
-load(); // 시작 시 로드
+// 모듈 로드
+const Handler = require("./modules/handler");
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    if (msg === ".리로드" && sender.toString() === "관리자") {
-        load();
-        return replier.reply("🔄 시스템이 재시작되었습니다.");
+    // 1. 관리자 업데이트 명령어는 유지
+    if (msg === "/업데이트" && sender === "관리자") {
+        updateBot(replier); // updateBot 함수는 여기에 포함되어 있어야 함
+        return;
     }
 
-    if (msg.startsWith(".")) {
-        try {
-            Handler.process(room, msg, sender, isGroupChat, replier);
-        } catch (e) {
-            replier.reply("❌ 실행 에러: " + e.message);
-        }
-    }
+    // 2. 그 외 모든 게임 명령어는 핸들러로 전달
+    Handler.process(msg, sender, replier);
 }
-// main.js response 함수 안에 임시 추가
-replier.reply("내 이름은: [" + sender + "]");
