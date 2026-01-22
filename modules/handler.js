@@ -117,9 +117,9 @@ Handler.process = function(msg, sender, replier) {
     }
 
 
-        // ------ [ 5. 일일 보상 및 이벤트 섹션 ] ------
+     // ------ [ 5. 일일 보상 및 이벤트 섹션 ] ------
     if (msg === ".출석") {
-        var today = new Date().toLocaleDateString(); // "2026. 1. 22." 형태
+        var today = new Date().toLocaleDateString();
         
         if (user.lastAttendance === today) {
             replier.reply("🔔 [ 출석 알림 ]\n이미 오늘의 보상을 받으셨습니다.\n내일 다시 찾아주세요!");
@@ -127,21 +127,24 @@ Handler.process = function(msg, sender, replier) {
         }
 
         user.money += 100;
-        user.exp += 20; 
-        user.lastAttendance = today; // 오늘 날짜 기록
+        user.exp += 50; // 테스트를 위해 경험치 상승폭을 높였습니다.
+        user.lastAttendance = today;
+
+        // [보강] 레벨업 체크
+        var isLevelUp = UserDB.checkLevelUp(user);
         
         UserDB.save(sender, user);
         
         var attMsg = "🎁 [ 출석 체크 완료 ]\n";
         attMsg += "━━━━━━━━━━━━━━\n";
         attMsg += "💰 보상: +100G\n";
-        attMsg += "✨ 보상: +20 EXP\n";
+        attMsg += "✨ 보상: +50 EXP\n";
+        if (isLevelUp) attMsg += "🎊 축하합니다! Lv." + user.level + "(으)로 레벨업!\n";
         attMsg += "━━━━━━━━━━━━━━\n";
         attMsg += "🔙 [.돌아가기]";
         replier.reply(attMsg);
         return;
     }
-
 
 
     // ------ [ 6. 관리자 전용 명령어 섹션 ] ------
