@@ -1,6 +1,6 @@
 {
-  "version": "1.9.8",
-  "updateNote": "Syntax Error(Invalid return) 긴급 디버깅 완료\n- 함수 스코프 외부에 존재하던 return 구문 제거 및 중괄호 정합성 확보\n- 유저 공통 메뉴 명칭 변경 반영 (보유 캐릭터 ➔ 캐릭터)\n- 매일 보상 시스템 문구 현행화\n- 관리자 원격 체크 및 개인 연동 가이드 로직 안정화",
+  "version": "2.0.0",
+  "updateNote": "전체 시스템 통합 정식 빌드(v2.0.0)\n- [handler.js] Invalid Return 오류 완전 방지를 위한 if-else 구조 최적화\n- [관리자] 백업, 복구, 관리자 추가/제거, 닉네임 변경, 초기화 로직 전원 실장\n- [가독성] 섹션별 구분선 및 아이콘 UI 통일\n- [규칙] '턴제' -> '매일', '보유 캐릭터' -> '캐릭터' 명칭 변경 완료\n- [경로] sdcard/msgbot/Bots/sub/ 기반 모듈 경로 안정화",
   "files": [
     "main.js",
     "modules/handler.js",
