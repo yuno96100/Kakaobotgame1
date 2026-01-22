@@ -3,11 +3,15 @@ const Handler = require("./modules/handler");
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
     if (msg.startsWith(".")) {
         try {
-            // 인자 순서: 방이름, 메시지, 보낸이, 단톡여부, 응답기
+            // [중요] 반드시 이 순서를 지켜야 합니다: room, msg, sender, isGroupChat, replier
             Handler.process(room, msg, sender, isGroupChat, replier);
         } catch (e) {
-            // 에러 발생 시 상세 원인 출력
-            replier.reply("❌ 실행 오류: " + e.message + "\n라인: " + e.lineNumber);
+            // replier가 살아있는지 확인 후 에러 출력
+            if (replier) {
+                replier.reply("❌ 실행 오류: " + e.message);
+            } else {
+                Log.error("핸들러 실행 오류 (replier 미정의): " + e.message);
+            }
         }
     }
 }
