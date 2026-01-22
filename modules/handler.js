@@ -15,20 +15,19 @@ Handler.process = function(msg, sender, replier) {
     var isRegistered = java.io.File(path).exists();
 
 
-  // ------ [ 2. 가입 처리 섹션 ] ------
+    // ------ [ 2. 가입 처리 섹션 ] ------
     if (!isRegistered) {
-        // [미가입 유저가 가입 시도]
         if (msg === ".가입") {
             UserDB.get(sender); 
             var success = "🎊 [ 소환사 등록 성공 ]\n";
             success += "━━━━━━━━━━━━━━\n";
             success += sender + "님, 소환사의 리그에 합류하신 것을 환영합니다!\n\n";
+            success += "⚠️ 주의: 닉네임 변경 시 데이터 보존을 위해 반드시 관리자에게 문의하세요.\n\n";
             success += "📜 '.메뉴'를 입력하여 모험을 시작하세요.";
             replier.reply(success);
             return;
         }
 
-        // [미가입 유저에게 가입 안내]
         var guide = "⚔️ [ 소환사의 협곡에 오신것을 환영합니다 ]\n";
         guide += "━━━━━━━━━━━━━━\n";
         guide += "아직 등록되지 않은 소환사입니다.\n";
@@ -37,20 +36,16 @@ Handler.process = function(msg, sender, replier) {
         replier.reply(guide);
         return;
     } else {
-        // [이미 가입된 유저가 .가입을 입력한 경우]
         if (msg === ".가입") {
             replier.reply("⚠️ [ 안내 ]\n이미 가입이 완료된 소환사입니다.\n게임을 시작하려면 [.메뉴]를 입력해주세요.");
             return;
         }
     }
 
-    // 가입된 유저의 데이터 로드
     var user = UserDB.get(sender);
 
 
-  // ------ [ 3. 시스템 및 도움말 섹션 ] ------
-    
-    // [명령어: .메뉴] - 명령어 표기 제거 및 초슬림 구성
+    // ------ [ 3. 시스템 및 도움말 섹션 ] ------
     if (msg === ".메뉴" || msg === ".돌아가기" || msg === "돌아가기") {
         var menu = "🎮 [ 메인 메뉴 ]\n";
         menu += "━━━━━━━━━━━━━━\n";
@@ -63,17 +58,16 @@ Handler.process = function(msg, sender, replier) {
         return;
     }
 
-    // [명령어: .도움말] - 관리자 명령어 제외 버전
     if (msg === ".도움말") {
         var help = "📜 [ 소환사 가이드 ]\n";
         help += "━━━━━━━━━━━━━━\n";
         help += "✅ [ 주요 기능 ]\n";
-        help += "• .정보 - 본인의 레벨, 전적, 자산 확인\n";
-        help += "• .캐릭터 - 보유 중인 캐릭터 목록 확인\n";
-        help += "• .출석 - 매일 보너스 보상 획득\n\n";
+        help += "• .정보 - 레벨, 경험치, 자산 확인\n";
+        help += "• .캐릭터 - 보유 캐릭터 목록 확인\n";
+        help += "• .출석 - 매일 100G 및 경험치 획득\n\n";
         help += "⚙️ [ 시스템 ]\n";
-        help += "• .메뉴 - 메인 화면으로 이동\n";
-        help += "• .돌아가기 - 이전 단계 또는 메뉴로 이동\n";
+        help += "• .메뉴 - 메인 화면 이동\n";
+        help += "• .돌아가기 - 이전 단계 이동\n";
         help += "━━━━━━━━━━━━━━";
         replier.reply(help);
         return;
@@ -117,22 +111,19 @@ Handler.process = function(msg, sender, replier) {
     }
 
 
-     // ------ [ 5. 일일 보상 및 이벤트 섹션 ] ------
+    // ------ [ 5. 일일 보상 및 이벤트 섹션 ] ------
     if (msg === ".출석") {
         var today = new Date().toLocaleDateString();
-        
         if (user.lastAttendance === today) {
             replier.reply("🔔 [ 출석 알림 ]\n이미 오늘의 보상을 받으셨습니다.\n내일 다시 찾아주세요!");
             return;
         }
 
         user.money += 100;
-        user.exp += 50; // 테스트를 위해 경험치 상승폭을 높였습니다.
+        user.exp += 50; 
         user.lastAttendance = today;
 
-        // [보강] 레벨업 체크
         var isLevelUp = UserDB.checkLevelUp(user);
-        
         UserDB.save(sender, user);
         
         var attMsg = "🎁 [ 출석 체크 완료 ]\n";
@@ -153,23 +144,80 @@ Handler.process = function(msg, sender, replier) {
         if (msg === ".관리자명령어") {
             var adminHelp = "🛠️ [ 관리자 시스템 ]\n";
             adminHelp += "━━━━━━━━━━━━━━\n";
-            adminHelp += "1️⃣ 시스템 관리\n";
-            adminHelp += "• .업데이트 / .시스템 / .권한부여\n\n";
-            adminHelp += "2️⃣ 데이터 보호\n";
-            adminHelp += "• .백업 / .백업목록 / .복구 확인\n\n";
-            adminHelp += "3️⃣ 유저 관리\n";
-            adminHelp += "• .초기화 [닉네임]\n";
+            adminHelp += "1️⃣ 시스템: .업데이트 / .시스템 / .권한부여\n";
+            adminHelp += "2️⃣ 데이터: .백업 / .백업목록 / .복구 확인\n";
+            adminHelp += "3️⃣ 유저: .초기화 [이름] / .닉네임변경 [기전닉] > [새닉]\n";
             adminHelp += "━━━━━━━━━━━━━━\n";
             adminHelp += "🔙 [.돌아가기]";
             replier.reply(adminHelp);
             return;
         }
 
-        // ... (.업데이트, .백업 등 기존 로직 동일) ...
-        if (msg === ".백업") { /* 백업 로직 */ }
-        if (msg === ".백업목록") { /* 백업목록 로직 */ }
-        if (msg === ".복구 확인") { /* 복구 로직 */ }
-        if (msg.startsWith(".초기화 ")) { /* 초기화 로직 */ }
+        // [닉네임 변경]
+        if (msg.startsWith(".닉네임변경 ")) {
+            try {
+                var names = msg.replace(".닉네임변경 ", "").split(">");
+                if (names.length !== 2) return replier.reply("❌ 사용법: .닉네임변경 이전닉네임 > 새닉네임");
+                var oldName = names[0].trim(), newName = names[1].trim();
+                var oldPath = "sdcard/msgbot/Bots/sub/data/" + oldName + ".json";
+                if (java.io.File(oldPath).exists()) {
+                    FileStream.write("sdcard/msgbot/Bots/sub/data/" + newName + ".json", FileStream.read(oldPath));
+                    replier.reply("✅ [데이터 이전 완료]\n" + oldName + " ➔ " + newName);
+                } else { replier.reply("❌ [" + oldName + "] 데이터를 찾을 수 없습니다."); }
+            } catch (e) { replier.reply("❌ 에러: " + e.message); }
+            return;
+        }
+
+        // [백업/복구 로직]
+        if (msg === ".백업") {
+            try {
+                var source = new java.io.File("sdcard/msgbot/Bots/sub/data/");
+                var backup = new java.io.File("sdcard/msgbot/Bots/sub/backup/");
+                if (!backup.exists()) backup.mkdirs();
+                var files = source.listFiles();
+                for (var i = 0; i < files.length; i++) {
+                    if (files[i].isFile()) FileStream.write("sdcard/msgbot/Bots/sub/backup/" + files[i].getName(), FileStream.read(files[i].getAbsolutePath()));
+                }
+                replier.reply("💾 [백업 완료]");
+            } catch (e) { replier.reply("❌ 실패: " + e.message); }
+            return;
+        }
+
+        if (msg === ".백업목록") {
+            try {
+                var backupFolder = new java.io.File("sdcard/msgbot/Bots/sub/backup/");
+                var files = backupFolder.listFiles();
+                var list = [];
+                for (var i = 0; i < files.length; i++) {
+                    if (files[i].isFile() && files[i].getName().endsWith(".json") && files[i].getName() !== "admins.json") {
+                        list.push(files[i].getName().replace(".json", ""));
+                    }
+                }
+                replier.reply("📂 [ 백업 목록 ]\n대상: " + list.length + "명\n명단: " + list.join(", "));
+            } catch (e) { replier.reply("❌ 실패: " + e.message); }
+            return;
+        }
+
+        if (msg === ".복구 확인") {
+            try {
+                var backupFolder = new java.io.File("sdcard/msgbot/Bots/sub/backup/");
+                var files = backupFolder.listFiles();
+                for (var i = 0; i < files.length; i++) {
+                    FileStream.write("sdcard/msgbot/Bots/sub/data/" + files[i].getName(), FileStream.read(files[i].getAbsolutePath()));
+                }
+                replier.reply("✅ [복구 완료]");
+            } catch (e) { replier.reply("❌ 실패: " + e.message); }
+            return;
+        }
+
+        // [초기화]
+        if (msg.startsWith(".초기화 ")) {
+            var target = msg.replace(".초기화 ", "").trim();
+            var resetData = { name: target, level: 1, exp: 0, maxExp: 100, money: 1000, win: 0, loss: 0, ownedChars: [101], lastAttendance: "" };
+            UserDB.save(target, resetData);
+            replier.reply("⚠️ [" + target + "] 리셋 완료.");
+            return;
+        }
     }
 };
 
