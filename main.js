@@ -26,3 +26,5 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
         }
     }
 }
+// main.js response 함수 안에 임시 추가
+replier.reply("내 이름은: [" + sender + "]");
