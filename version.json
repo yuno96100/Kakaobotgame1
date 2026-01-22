@@ -1,5 +1,5 @@
 {
-  "version": "1.2.4",
+  "version": "1.2.5",
   "updateNote": "핸들러 섹션 최적화 및 내보내기 코드 복구\n- [Fix] module.exports = Handler; 구문 명시적 추가\n- [Structure] 가이드에 따라 가입/매일메뉴/관리자 섹션 3단계 분리\n- [Admin] 관리자추가/제거 기능을 AdminDB 모듈과 연동 완료\n- [Naming] 관리자 '관리자', 환영문구 '매일', 캐릭터 메뉴 '캐릭터' 명칭 준수",
   "files": [
     "modules/handler.js"
