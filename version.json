@@ -1,11 +1,11 @@
 {
-  "version": "1.2.0",
-  "updateNote": "성능 최적화: 메모리 캐싱(Memory Caching) 시스템 도입\n- 유저 데이터 접근 시 파일 I/O 대신 메모리(RAM) 우선 참조\n- 반복적인 명령어 입력 시 응답 속도 대폭 향상\n- 데이터 일관성 유지를 위한 캐시-파일 동기화 로직 적용\n- 봇 안정성 강화를 위한 예외 처리 최적화",
+  "version": "1.2.2",
+  "updateNote": "시스템 안정성 및 관리자 제어 통합 패치\n- 메모리 캐싱(Memory Caching) 도입으로 데이터 처리 속도 최적화\n- 관리자 실시간 권한 관리 시스템(.관리자추가/제거) 도입\n- 데이터 백업, 복구, 이전, 초기화 로직 완전 실장\n- 메인 메뉴 하단 [📜 명령어 안내] 섹션 추가로 직관성 강화\n- 레벨업 보상 및 경험치 바 정밀 보정",
   "files": [
     "main.js",
     "modules/handler.js",
     "modules/user.js",
-    "modules/champions.js",
-    "modules/admin.js"
+    "modules/admin.js",
+    "modules/champions.js"
   ]
 }
