@@ -1,10 +1,7 @@
 {
-  "version": "2.0.1",
-  "updateNote": "Undefined Replier 에러 완전 해결 빌드\n- main.js 호출부와 handler.js 선언부의 5인자(Argument) 인터페이스 강제 동기화\n- 가입 명령어(.가입) 입력 시 응답 객체(replier) 참조 실패 현상 수정\n- 전체 모듈 경로 및 인자 전달 프로세스 재검증 완료",
+  "version": "2.0.3",
+  "updateNote": "Syntax Error(Unterminated string literal) 긴급 수정 빌드\n- 줄바꿈 문자열 내 따옴표 마감 정합성 전수 조사 및 수정\n- 93번 라인 부근 관리자 도구 설명 텍스트 구조 안정화\n- 모든 관리자 기능(백업/복구/닉네임/초기화) 로직 포함 유지\n- '턴제' -> '매일', '보유 캐릭터' -> '캐릭터' 명칭 변경 최종 적용",
   "files": [
-    "main.js",
-    "modules/handler.js",
-    "modules/user.js",
-    "modules/admin.js"
+    "modules/handler.js"
   ]
 }
