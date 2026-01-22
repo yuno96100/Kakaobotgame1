@@ -1,6 +1,6 @@
 {
-  "version": "2.0.0",
-  "updateNote": "전체 시스템 통합 정식 빌드(v2.0.0)\n- [handler.js] Invalid Return 오류 완전 방지를 위한 if-else 구조 최적화\n- [관리자] 백업, 복구, 관리자 추가/제거, 닉네임 변경, 초기화 로직 전원 실장\n- [가독성] 섹션별 구분선 및 아이콘 UI 통일\n- [규칙] '턴제' -> '매일', '보유 캐릭터' -> '캐릭터' 명칭 변경 완료\n- [경로] sdcard/msgbot/Bots/sub/ 기반 모듈 경로 안정화",
+  "version": "2.0.1",
+  "updateNote": "Undefined Replier 에러 완전 해결 빌드\n- main.js 호출부와 handler.js 선언부의 5인자(Argument) 인터페이스 강제 동기화\n- 가입 명령어(.가입) 입력 시 응답 객체(replier) 참조 실패 현상 수정\n- 전체 모듈 경로 및 인자 전달 프로세스 재검증 완료",
   "files": [
     "main.js",
     "modules/handler.js",
