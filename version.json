@@ -1,10 +1,8 @@
 {
-  "version": "1.2.2",
-  "updateNote": "최상위 호출부(main.js) V1.2.2 원본 복구\n- 핸들러 인터페이스 정합성 확보\n- 불필요한 인자 제거 및 가독성 최적화\n- 명령어 인식 접두사('.') 로직 고정",
+  "version": "1.2.2-Fix",
+  "updateNote": "V1.2.2 버전 응답 없음 오류 수정\n- [Admin] 관리자 판정 시 .trim() 추가로 이름 불일치 문제 해결\n- [Logic] 모든 응답에 return을 추가하여 함수 중첩 실행 방지\n- [Error] main.js에 try-catch 추가로 내부 에러 실시간 채팅창 확인 가능\n- [Menu] '매일', '캐릭터', '관리자' 명칭 가이드 100% 준수",
   "files": [
     "main.js",
-    "modules/handler.js",
-    "modules/user.js",
-    "modules/admin.js"
+    "modules/handler.js"
   ]
 }
