@@ -1,15 +1,15 @@
-
 const USER_PATH = "sdcard/msgbot/Bots/sub/data/";
 
 const UserDB = {};
 
-// [보강] 레벨업 체크 함수
+// 레벨업 체크 및 보상 로직
 UserDB.checkLevelUp = function(userData) {
     var leveledUp = false;
     while (userData.exp >= userData.maxExp) {
         userData.exp -= userData.maxExp;
         userData.level++;
-        userData.maxExp = Math.floor(userData.maxExp * 1.2); // 레벨당 필요 경험치 20% 증가
+        userData.maxExp = Math.floor(userData.maxExp * 1.2); // 다음 레벨 요구치 20% 증가
+        userData.money += 500; // 레벨업 보상 500G
         leveledUp = true;
     }
     return leveledUp;
@@ -39,7 +39,7 @@ UserDB.get = function(name) {
         } else {
             userData = JSON.parse(FileStream.read(USER_PATH + name + ".json"));
             
-            // 필드 자동 보정 (Schema 보정)
+            // 데이터 필드 자동 보정 (Schema 보정)
             var updated = false;
             if (userData.exp === undefined) { userData.exp = 0; updated = true; }
             if (userData.maxExp === undefined) { userData.maxExp = 100; updated = true; }
@@ -49,17 +49,12 @@ UserDB.get = function(name) {
         }
         return userData;
     } catch (e) {
-        Log.error(name + " 데이터 로드 실패: " + e.message);
         return null;
     }
 };
 
 UserDB.save = function(name, data) {
-    try {
-        FileStream.write(USER_PATH + name + ".json", JSON.stringify(data));
-    } catch (e) {
-        Log.error(name + " 데이터 저장 실패: " + e.message);
-    }
+    FileStream.write(USER_PATH + name + ".json", JSON.stringify(data));
 };
 
 module.exports = UserDB;
