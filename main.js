@@ -1,7 +1,8 @@
 // sdcard/msgbot/Bots/sub/main.js
 
 const Handler = require("./modules/handler");
-const BridgeTest = require("./modules/bridge_test"); // 연동 테스트용 모듈 추가
+const BridgeTest = require("sdcard/msgbot/Bots/sub/modules/bridge_test");
+
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
     
