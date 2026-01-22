@@ -1,7 +1,8 @@
 {
-  "version": "1.2.3",
-  "updateNote": "시스템 예외 처리 보강 및 유저 편의성 패치\n- 이미 가입된 유저가 '.가입' 입력 시 안내 문구 출력 로직 추가\n- 관리자 명령어 안내 섹션의 가독성 및 이모지 디자인 정밀 조정\n- 닉네임 변경 및 데이터 이전 로직의 안정성 검증 완료",
+  "version": "1.8.7",
+  "updateNote": "데이터 정합성을 위한 UserDB 모듈 동기화 패치\n- 유저 초기 데이터 생성 로직에 roomName, status 필드 강제 포함\n- 레벨업 시 골드 보너스 자동 지급 로직 점검\n- 메인 엔트리(main.js) 인자 전달 구조 최종 확정",
   "files": [
-    "modules/handler.js"
+    "modules/user.js",
+    "main.js"
   ]
 }
