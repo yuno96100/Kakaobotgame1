@@ -8,10 +8,11 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
     var isAdmin = (admins.indexOf(sender) > -1 || sender === "관리자");
     var isRegistered = java.io.File("sdcard/msgbot/Bots/sub/data/" + sender + ".json").exists();
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // [ 🌐 섹션 1: 단체 채팅방 - 가이드 및 중계 ]
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     if (isGroupChat) {
+        // 1. 관리자 전용: 유저 상태 원격 조회 (연동 여부와 무관하게 작동)
         if (isAdmin && msg.startsWith(".유저체크 ")) {
             var target = msg.replace(".유저체크 ", "").trim();
             if (!java.io.File("sdcard/msgbot/Bots/sub/data/" + target + ".json").exists()) {
@@ -27,18 +28,33 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
             return replier.reply(status);
         }
 
+        // 2. 가입/연동/메뉴 가이드
         if (msg === ".가입" || msg === ".연동" || msg === ".메뉴" || msg === ".정보") {
+            // [CASE A] 이미 가입(파일 존재)된 경우
             if (isRegistered) {
-                return replier.reply("🔔 [" + sender + "]님은 이미 등록된 소환사입니다.\n조작은 봇과의 1:1 대화방을 이용해주세요!");
+                var checkUser = UserDB.get(sender);
+                // 가입은 됐는데 개인톡 연동(roomName)이 없는 경우 (관리자 포함)
+                if (!checkUser.roomName) {
+                    var linkGuide = "⚠️ [ 연동 미완료 안내 ]\n" + "━".repeat(12) + "\n" +
+                                    (isAdmin ? "관리자님, " : sender + "님, ") + "데이터는 존재하나\n개인톡 방이 등록되지 않았습니다.\n\n" +
+                                    "👉 **해결 방법:**\n" +
+                                    "서브폰(봇)에게 1:1 대화를 걸어\n**[.연동]**을 반드시 입력해주세요!\n" +
+                                    "━".repeat(12);
+                    return replier.reply(linkGuide);
+                }
+                // 가입도 됐고 연동도 이미 완료된 경우
+                return replier.reply("🔔 [" + sender + "]님은 연동이 완료된 상태입니다.\n모든 조작은 봇과의 1:1 대화방을 이용해주세요!");
             }
-            var guide = "⚔️ [ 소환사의 협곡 입성 ]\n" + "━".repeat(12) + "\n" +
-                        "리그 참여를 위해 '봇 계정'과의\n1:1 개인톡 연동이 필수입니다.\n\n" +
-                        "✅ [ 연동 방법 ]\n" +
-                        "1. 봇 프로필 ➔ 1:1 채팅 시작\n" +
-                        "2. 채팅방에 [.연동] 입력\n" +
-                        "━".repeat(12) + "\n" +
-                        "⚠️ 연동 시 자동으로 가입 처리됩니다.";
-            return replier.reply(guide);
+
+            // [CASE B] 아예 미가입 상태인 경우
+            var newGuide = "⚔️ [ 소환사의 협곡 입성 ]\n" + "━".repeat(12) + "\n" +
+                           "리그 참여를 위해 '봇 계정'과의\n1:1 개인톡 연동이 필수입니다.\n\n" +
+                           "✅ [ 연동 방법 ]\n" +
+                           "1. 봇 프로필 ➔ 1:1 채팅 시작\n" +
+                           "2. 채팅방에 [.연동] 입력\n" +
+                           "━".repeat(12) + "\n" +
+                           "⚠️ 연동 시 자동으로 가입 처리됩니다.";
+            return replier.reply(newGuide);
         }
         return; 
     }
