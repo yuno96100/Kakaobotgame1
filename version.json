@@ -1,11 +1,5 @@
 {
-  "version": "1.1.1",
-  "updateNote": "메인 메뉴 UI 최적화\n- 메뉴 리스트에서 명령어 표기 제거하여 가독성 향상\n- 도움말과 메뉴 기능의 완전 분리",
-  "files": [
-    "main.js",
-    "modules/handler.js",
-    "modules/user.js",
-    "modules/champions.js",
-    "modules/admin.js"
-  ]
+  "version": "1.1.2",
+  "updateNote": "데이터 안정성 보강\n- 출석 체크 24시간 제한 시스템 도입\n- 유저 데이터 필드 자동 보정 로직 추가\n- 데이터 누락으로 인한 핸들러 에러 방지",
+  "files": ["main.js", "modules/handler.js", "modules/user.js", "modules/champions.js", "modules/admin.js"]
 }
