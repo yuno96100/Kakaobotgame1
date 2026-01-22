@@ -117,10 +117,19 @@ Handler.process = function(msg, sender, replier) {
     }
 
 
-    // ------ [ 5. 일일 보상 및 이벤트 섹션 ] ------
+        // ------ [ 5. 일일 보상 및 이벤트 섹션 ] ------
     if (msg === ".출석") {
+        var today = new Date().toLocaleDateString(); // "2026. 1. 22." 형태
+        
+        if (user.lastAttendance === today) {
+            replier.reply("🔔 [ 출석 알림 ]\n이미 오늘의 보상을 받으셨습니다.\n내일 다시 찾아주세요!");
+            return;
+        }
+
         user.money += 100;
         user.exp += 20; 
+        user.lastAttendance = today; // 오늘 날짜 기록
+        
         UserDB.save(sender, user);
         
         var attMsg = "🎁 [ 출석 체크 완료 ]\n";
@@ -132,6 +141,7 @@ Handler.process = function(msg, sender, replier) {
         replier.reply(attMsg);
         return;
     }
+
 
 
     // ------ [ 6. 관리자 전용 명령어 섹션 ] ------
