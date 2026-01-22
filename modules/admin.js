@@ -2,7 +2,10 @@ const AdminDB = {};
 const path = "sdcard/msgbot/Bots/sub/modules/admin_list.json";
 
 AdminDB.getAdmins = function() {
-    if (!java.io.File(path).exists()) return ["관리자"];
+    if (!java.io.File(path).exists()) {
+        FileStream.write(path, JSON.stringify(["관리자"]));
+        return ["관리자"];
+    }
     return JSON.parse(FileStream.read(path));
 };
 
