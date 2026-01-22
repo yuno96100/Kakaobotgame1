@@ -8,11 +8,10 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
     var isAdmin = (admins.indexOf(sender) > -1 || sender === "관리자");
     var isRegistered = java.io.File("sdcard/msgbot/Bots/sub/data/" + sender + ".json").exists();
 
-   // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // [ 🌐 섹션 1: 단체 채팅방 - 가이드 및 중계 ]
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     if (isGroupChat) {
-        // 1. 관리자 전용: 유저 상태 원격 조회 (연동 여부와 무관하게 작동)
         if (isAdmin && msg.startsWith(".유저체크 ")) {
             var target = msg.replace(".유저체크 ", "").trim();
             if (!java.io.File("sdcard/msgbot/Bots/sub/data/" + target + ".json").exists()) {
@@ -28,39 +27,28 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
             return replier.reply(status);
         }
 
-        // 2. 가입/연동/메뉴 가이드
         if (msg === ".가입" || msg === ".연동" || msg === ".메뉴" || msg === ".정보") {
-            // [CASE A] 이미 가입(파일 존재)된 경우
             if (isRegistered) {
                 var checkUser = UserDB.get(sender);
-                // 가입은 됐는데 개인톡 연동(roomName)이 없는 경우 (관리자 포함)
                 if (!checkUser.roomName) {
-                    var linkGuide = "⚠️ [ 연동 미완료 안내 ]\n" + "━".repeat(12) + "\n" +
-                                    (isAdmin ? "관리자님, " : sender + "님, ") + "데이터는 존재하나\n개인톡 방이 등록되지 않았습니다.\n\n" +
-                                    "👉 **해결 방법:**\n" +
-                                    "서브폰(봇)에게 1:1 대화를 걸어\n**[.연동]**을 반드시 입력해주세요!\n" +
-                                    "━".repeat(12);
-                    return replier.reply(linkGuide);
+                    return replier.reply("⚠️ [ 연동 미완료 ]\n" + "━".repeat(12) + "\n데이터는 존재하나 개인톡 연동이 안 되었습니다.\n봇에게 1:1 대화로 [.연동]을 보내주세요!");
                 }
-                // 가입도 됐고 연동도 이미 완료된 경우
-                return replier.reply("🔔 [" + sender + "]님은 연동이 완료된 상태입니다.\n모든 조작은 봇과의 1:1 대화방을 이용해주세요!");
+                return replier.reply("🔔 [" + sender + "]님은 연동 완료 상태입니다.\n조작은 봇과의 1:1 대화방을 이용해주세요!");
             }
-
-            // [CASE B] 아예 미가입 상태인 경우
-            var newGuide = "⚔️ [ 소환사의 협곡 입성 ]\n" + "━".repeat(12) + "\n" +
-                           "리그 참여를 위해 '봇 계정'과의\n1:1 개인톡 연동이 필수입니다.\n\n" +
-                           "✅ [ 연동 방법 ]\n" +
-                           "1. 봇 프로필 ➔ 1:1 채팅 시작\n" +
-                           "2. 채팅방에 [.연동] 입력\n" +
-                           "━".repeat(12) + "\n" +
-                           "⚠️ 연동 시 자동으로 가입 처리됩니다.";
-            return replier.reply(newGuide);
+            var guide = "⚔️ [ 소환사의 협곡 입성 ]\n" + "━".repeat(12) + "\n" +
+                        "리그 참여를 위해 '봇 계정'과의\n1:1 개인톡 연동이 필수입니다.\n\n" +
+                        "✅ [ 연동 방법 ]\n" +
+                        "1. 봇 프로필 ➔ 1:1 채팅 시작\n" +
+                        "2. 채팅방에 [.연동] 입력\n" +
+                        "━".repeat(12) + "\n" +
+                        "⚠️ 연동 시 자동으로 가입 처리됩니다.";
+            return replier.reply(guide);
         }
         return; 
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // [ 📱 섹션 2: 개인 채팅방 - 대시보드 및 조작 ]
+    // [ 📱 섹션 2: 개인 채팅방 - 조작 ]
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     if (!isGroupChat) {
         if (msg === ".연동") {
@@ -68,64 +56,52 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
                 var user = UserDB.get(sender);
                 user.roomName = room;
                 UserDB.save(sender, user);
-                return replier.reply("✅ 이미 연동된 계정입니다.\n[.메뉴]를 입력하여 시작하세요.");
+                return replier.reply("✅ 이미 연동되었습니다.\n[.메뉴]를 입력하여 시작하세요.");
             }
             var newUser = UserDB.get(sender); 
             newUser.roomName = room;
             UserDB.save(sender, newUser);
-            return replier.reply("🎊 [ 가입 및 연동 성공 ]\n" + "━".repeat(12) + "\n" +
-                                 sender + " 소환사님 환영합니다!\n\n" +
-                                 "이제부터 이곳은 당신의\n'개인 전용 관리실'입니다.\n\n" +
-                                 "👉 바로 시작하기 ➔ [.메뉴]");
+            return replier.reply("🎊 [ 가입 및 연동 성공 ]\n" + sender + "님 환영합니다!\n👉 [.메뉴]를 입력하세요!");
         }
 
-        if (!isRegistered) return replier.reply("⚠️ 연동되지 않은 소환사입니다.\n[.연동]을 입력하여 가입을 먼저 해주세요.");
+        if (!isRegistered) return replier.reply("⚠️ [.연동]을 입력하여 가입을 먼저 해주세요.");
 
         var user = UserDB.get(sender);
 
         if (msg === ".메뉴" || msg === ".돌아가기") {
             var menu = "🎮 [ 메인 메뉴 ]\n" + "━".repeat(12) + "\n" +
-                       "1️⃣ .정보   (소환사 정보)\n" +
-                       "2️⃣ .캐릭터 (보유 챔피언)\n" +
-                       "3️⃣ .출석   (매일 보상)\n" +
+                       "1️⃣ .정보\n2️⃣ .캐릭터\n3️⃣ .출석\n" +
                        (isAdmin ? "🛠️ .관리자명령어\n" : "") +
-                       "━".repeat(12) + "\n" +
-                       "🔙 모든 조작은 여기서만 가능합니다.";
+                       "━".repeat(12);
             return replier.reply(menu);
         }
 
         if (msg === ".정보") {
             var expP = Math.floor((user.exp / user.maxExp) * 100);
             var bar = "■".repeat(Math.floor(expP/10)) + "□".repeat(10-Math.floor(expP/10));
-            var info = "📜 [ " + sender + " 상세 정보 ]\n" + "━".repeat(12) + "\n" +
-                       "👤 닉네임: " + user.name + (isAdmin ? " (관리자)" : "") + "\n" +
-                       "⭐ 레벨: Lv." + user.level + "\n" +
-                       "📊 경험치: [" + bar + "] " + expP + "%\n" +
-                       "💰 골드: " + user.money.toLocaleString() + "G\n" +
-                       "⚔️ 전적: " + user.win + "승 " + user.loss + "패\n" +
-                       "━".repeat(12) + "\n" +
-                       "🔙 돌아가기 ➔ [.메뉴]";
-            return replier.reply(info);
+            replier.reply("📜 [ " + sender + " 정보 ]\n" + "━".repeat(12) + "\n⭐ Lv." + user.level + "\n📊 EXP: [" + bar + "]\n💰 골드: " + user.money.toLocaleString() + "G\n━".repeat(12));
+            return;
         }
 
         if (msg === ".출석") {
             var today = new Date().toLocaleDateString();
-            if (user.lastAttendance === today) return replier.reply("🔔 [ 출석 알림 ]\n이미 오늘의 보상을 받으셨습니다.");
+            if (user.lastAttendance === today) return replier.reply("🔔 이미 오늘 보상을 받았습니다.");
             user.money += 100; user.exp += 50; user.lastAttendance = today;
-            var up = UserDB.checkLevelUp(user);
             UserDB.save(sender, user);
-            return replier.reply("🎁 [ 매일 출석 완료 ]\n" + "━".repeat(12) + "\n" +
-                                 "💰 보상 골드: +100G\n" +
-                                 "📈 보상 경험치: +50EXP\n" +
-                                 (up ? "🎊 레벨업 성공! ➔ Lv." + user.level + "\n" : "") +
-                                 "━".repeat(12) + "\n" +
-                                 "🔙 돌아가기 ➔ [.메뉴]");
-        }
-
-        if (msg === ".캐릭터") {
-            replier.reply("⚔️ [ 캐릭터 ]\n" + "━".repeat(12) + "\n보유 중인 캐릭터 목록을 불러오고 있습니다...\n(현재 개발 중인 기능입니다)\n" + "━".repeat(12) + "\n🔙 돌아가기 ➔ [.메뉴]");
+            replier.reply("🎁 출석 완료! (100G / 50EXP)");
             return;
         }
+
+        if (isAdmin) {
+            // 여기에 이전의 백업/복구 등 관리자 상세 기능을 넣어주시면 됩니다.
+            if (msg === ".관리자명령어") {
+                replier.reply("🛠️ 관리자 도구\n.백업 / .복구 확인 / .초기화 [이름]");
+            }
+        }
+    }
+};
+
+module.exports = Handler;
 
         // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
         // [ 🛠️ 섹션 3: 관리자 전용 제어 - 상세 로직 ]
