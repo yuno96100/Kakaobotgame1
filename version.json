@@ -1,6 +1,6 @@
 {
-  "version": "2.3.1",
-  "updateNote": "개인톡 연동 제거 및 즉시 가입 시스템으로 롤백\n- [handler.js] .가입 입력 시 즉시 데이터 생성 및 사용 가능\n- [Admin] 관리자 이름 '관리자' 고정 및 모든 관리자 도구 포함\n- [UI] '턴제' -> '매일', '보유 캐릭터' -> '캐릭터' 명칭 변경 유지\n- [Stability] Invalid return 및 replier undefined 오류 방지 구조 적용",
+  "version": "1.2.2",
+  "updateNote": "최상위 호출부(main.js) V1.2.2 원본 복구\n- 핸들러 인터페이스 정합성 확보\n- 불필요한 인자 제거 및 가독성 최적화\n- 명령어 인식 접두사('.') 로직 고정",
   "files": [
     "main.js",
     "modules/handler.js",
