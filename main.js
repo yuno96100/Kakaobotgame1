@@ -6,7 +6,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
     var senderName = sender.toString().split("\n")[0].trim();
     
     // [설정] 모든 기록이 남을 그룹톡방 이름
-    var ADMIN_GROUP_ROOM = "소환사의 협곡 오픈채팅"; 
+    var ADMIN_GROUP_ROOM = "소환사의 협곡"; 
 
     // 1. 공통 디버깅 명령어
     if (msg === ".체크") {
