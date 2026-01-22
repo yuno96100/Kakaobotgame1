@@ -1,7 +1,10 @@
 {
-  "version": "2.0.3",
-  "updateNote": "Syntax Error(Unterminated string literal) 긴급 수정 빌드\n- 줄바꿈 문자열 내 따옴표 마감 정합성 전수 조사 및 수정\n- 93번 라인 부근 관리자 도구 설명 텍스트 구조 안정화\n- 모든 관리자 기능(백업/복구/닉네임/초기화) 로직 포함 유지\n- '턴제' -> '매일', '보유 캐릭터' -> '캐릭터' 명칭 변경 최종 적용",
+  "version": "2.3.0",
+  "updateNote": "개인톡 연동 제거 및 즉시 가입 시스템으로 롤백\n- [handler.js] .가입 입력 시 즉시 데이터 생성 및 사용 가능\n- [Admin] 관리자 이름 '관리자' 고정 및 모든 관리자 도구 포함\n- [UI] '턴제' -> '매일', '보유 캐릭터' -> '캐릭터' 명칭 변경 유지\n- [Stability] Invalid return 및 replier undefined 오류 방지 구조 적용",
   "files": [
-    "modules/handler.js"
+    "main.js",
+    "modules/handler.js",
+    "modules/user.js",
+    "modules/admin.js"
   ]
 }
