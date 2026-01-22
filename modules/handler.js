@@ -44,7 +44,7 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
                         "⚠️ 연동 시 자동으로 가입 처리됩니다.";
             return replier.reply(guide);
         }
-        return; 
+        return; // 이 return은 함수 내부이므로 정상입니다.
     }
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -70,17 +70,20 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
 
         if (msg === ".메뉴" || msg === ".돌아가기") {
             var menu = "🎮 [ 메인 메뉴 ]\n" + "━".repeat(12) + "\n" +
-                       "1️⃣ .정보\n2️⃣ .캐릭터\n3️⃣ .출석\n" +
+                       "1️⃣ .정보   (소환사 정보)\n" +
+                       "2️⃣ .캐릭터 (보유 챔피언)\n" +
+                       "3️⃣ .출석   (매일 보상)\n" +
                        (isAdmin ? "🛠️ .관리자명령어\n" : "") +
-                       "━".repeat(12);
+                       "━".repeat(12) + "\n" +
+                       "🔙 모든 조작은 여기서만 가능합니다.";
             return replier.reply(menu);
         }
 
         if (msg === ".정보") {
             var expP = Math.floor((user.exp / user.maxExp) * 100);
             var bar = "■".repeat(Math.floor(expP/10)) + "□".repeat(10-Math.floor(expP/10));
-            replier.reply("📜 [ " + sender + " 정보 ]\n" + "━".repeat(12) + "\n⭐ Lv." + user.level + "\n📊 EXP: [" + bar + "]\n💰 골드: " + user.money.toLocaleString() + "G\n━".repeat(12));
-            return;
+            var info = "📜 [ " + sender + " 정보 ]\n" + "━".repeat(12) + "\n👤 닉네임: " + user.name + (isAdmin ? " (관리자)" : "") + "\n⭐ Lv." + user.level + "\n📊 EXP: [" + bar + "]\n💰 골드: " + user.money.toLocaleString() + "G\n━".repeat(12) + "\n🔙 돌아가기 ➔ [.메뉴]";
+            return replier.reply(info);
         }
 
         if (msg === ".출석") {
@@ -88,18 +91,24 @@ Handler.process = function(room, msg, sender, isGroupChat, replier) {
             if (user.lastAttendance === today) return replier.reply("🔔 이미 오늘 보상을 받았습니다.");
             user.money += 100; user.exp += 50; user.lastAttendance = today;
             UserDB.save(sender, user);
-            replier.reply("🎁 출석 완료! (100G / 50EXP)");
-            return;
+            return replier.reply("🎁 [ 매일 출석 완료 ]\n보상: 100G / 50EXP 획득!\n━".repeat(12) + "\n🔙 돌아가기 ➔ [.메뉴]");
         }
 
+        if (msg === ".캐릭터") {
+            return replier.reply("⚔️ [ 캐릭터 ]\n" + "━".repeat(12) + "\n보유 중인 캐릭터 목록을 불러오는 중...\n(기능 구현 중)\n" + "━".repeat(12) + "\n🔙 돌아가기 ➔ [.메뉴]");
+        }
+
+        // [ 관리자 상세 기능 ]
         if (isAdmin) {
-            // 여기에 이전의 백업/복구 등 관리자 상세 기능을 넣어주시면 됩니다.
             if (msg === ".관리자명령어") {
-                replier.reply("🛠️ 관리자 도구\n.백업 / .복구 확인 / .초기화 [이름]");
+                return replier.reply("🛠️ [ 관리자 도구 ]\n.백업 / .복구 확인 / .초기화 [이름] / .닉네임변경 [A]>[B]");
             }
+            // 필요한 경우 여기에 백업/복구 상세 로직을 다시 추가하세요.
         }
     }
-};
+}; // Handler.process 함수 종료 지점
+
+module.exports = Handler;
 
 module.exports = Handler;
 
