@@ -1,11 +1,7 @@
 {
-  "version": "1.2.2",
-  "updateNote": "시스템 안정성 및 관리자 제어 통합 패치\n- 메모리 캐싱(Memory Caching) 도입으로 데이터 처리 속도 최적화\n- 관리자 실시간 권한 관리 시스템(.관리자추가/제거) 도입\n- 데이터 백업, 복구, 이전, 초기화 로직 완전 실장\n- 메인 메뉴 하단 [📜 명령어 안내] 섹션 추가로 직관성 강화\n- 레벨업 보상 및 경험치 바 정밀 보정",
+  "version": "1.2.3",
+  "updateNote": "시스템 예외 처리 보강 및 유저 편의성 패치\n- 이미 가입된 유저가 '.가입' 입력 시 안내 문구 출력 로직 추가\n- 관리자 명령어 안내 섹션의 가독성 및 이모지 디자인 정밀 조정\n- 닉네임 변경 및 데이터 이전 로직의 안정성 검증 완료",
   "files": [
-    "main.js",
-    "modules/handler.js",
-    "modules/user.js",
-    "modules/admin.js",
-    "modules/champions.js"
+    "modules/handler.js"
   ]
 }
