@@ -4,6 +4,7 @@
   "files": [
     "modules/user.js",
     "main.js",
-    "modules/handler.js"
+    "modules/handler.js",
+    "modules/admin.js"
   ]
 }
