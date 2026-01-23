@@ -1,5 +1,5 @@
 {
-  "version": "1.4.5",
+  "version": "1.4.6",
   "updateNote": "핸들러 전체 코드 복원 및 방 판정 로직 안정화 (생략 없음)",
   "files": ["modules/handler.js"]
 }
