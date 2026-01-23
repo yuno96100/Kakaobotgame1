@@ -1,7 +1,8 @@
 {
-  "version": "1.0.6",
-  "updateNote": "재구축 완료: 숫자 세션 메뉴, 중복 가입 처리, 관리자 전용 도구 통합",
+  "version": "1.0.7",
+  "updateNote": "Main-Handler 연동 최적화 및 /업데이트 로직 보강",
   "files": [
+    "main.js",
     "modules/handler.js"
   ]
 }
