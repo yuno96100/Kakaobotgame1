@@ -1,6 +1,6 @@
 {
-  "version": "1.1.3",
-  "note": "방 이름 대신 고유 방 해시 식별 로직 적용",
+  "version": "1.1.4",
+  "note": "방 해시 식별 시스템 및 미가입자 자동 안내 엔진 통합",
   "files": [
     "main.js",
     "modules/handler.js"
