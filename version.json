@@ -1,8 +1,5 @@
 {
-  "version": "1.1.2",
-  "updateNote": "Main-Handler 연동 최적화 및 /업데이트 로직 보강",
-  "files": [
-    "main.js",
-    "modules/handler.js"
-  ]
+  "version": "1.1.0",
+  "updateNote": "핸들러 초기화: 초기 안정 구조 롤백 및 숫자 메뉴 세션 통합",
+  "files": ["modules/handler.js"]
 }
