@@ -1,6 +1,6 @@
 {
   "version": "1.4.3",
-  "updateNote": "테스트"
+  "updateNote": "테스트",
   "files": [
     "main.js",
     "modules/bridge_test.js"
