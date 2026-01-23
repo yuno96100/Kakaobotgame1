@@ -127,4 +127,13 @@ Handler.process = function(msg, sender, replier) {
             return;
         }
 
-        if (msg.
+        if (msg.startsWith(".초기화 ")) {
+            var t = msg.replace(".초기화 ", "").trim();
+            UserDB.save(t, { name: t, level: 1, exp: 0, maxExp: 100, money: 1000, win: 0, loss: 0, ownedChars: [101], lastAttendance: "" });
+            replier.reply("⚠️ [" + t + "] 초기화 완료.");
+            return;
+        }
+    }
+};
+
+module.exports = Handler;
