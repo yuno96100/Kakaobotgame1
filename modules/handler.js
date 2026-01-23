@@ -5,7 +5,7 @@ const AdminDB = require("./admin");
 const Handler = {};
 
 // [설정] 시스템(서브폰) 프로필 링크 또는 오픈채팅 링크
-const PRIVATE_CHAT_LINK = "https://open.kakao.com/o/s4pX9Nci"; 
+const PRIVATE_CHAT_LINK = "https://open.kakao.com/o/sXXXXXX"; 
 
 Handler.process = function(msg, sender, replier, room) {
     if (!msg || !msg.startsWith(".")) return; 
@@ -120,4 +120,43 @@ Handler.process = function(msg, sender, replier, room) {
     }
 
     if (msg === ".가입") {
-        replier.reply("🔔 이미 가입된 소환사입니다.\
+        replier.reply("🔔 이미 가입된 소환사입니다.\n[.메뉴]를 입력해 보세요.");
+        return;
+    }
+
+    var user = UserDB.get(sender);
+    if (!user) return;
+
+    // [B-2] 유저 명령어 처리
+    if (msg === ".메뉴" || msg === ".돌아가기") {
+        var menu = "🎮 [ 개인 컨트롤러 ]\n━━━━━━━━━━━━━━\n1️⃣ 소환사 정보 (.정보)\n2️⃣ 캐릭터 확인 (.캐릭터)\n3️⃣ 매일 출석 (.출석)\n━━━━━━━━━━━━━━\n🔙 [.메뉴]";
+        replier.reply(menu);
+        return;
+    }
+
+    if (msg === ".정보" || msg === "1") {
+        var expP = Math.floor((user.exp / user.maxExp) * 100);
+        var bar = "■".repeat(Math.floor(expP/10)) + "□".repeat(10-Math.floor(expP/10));
+        replier.reply("📜 [ 정보 ]\n👤: " + user.name + "\n⭐: Lv." + user.level + "\n📊: [" + bar + "] " + expP + "%\n💰: " + user.money.toLocaleString() + "G\n⚔️: " + user.win + "승 " + user.loss + "패");
+        return;
+    }
+
+    if (msg === ".캐릭터" || msg === "2") {
+        replier.reply("⚔️ [ 보유 캐릭터 ]\n━━━━━━━━━━━━━━\n" + (user.ownedChars ? user.ownedChars.join(", ") : "101") + "\n━━━━━━━━━━━━━━");
+        return;
+    }
+
+    if (msg === ".출석" || msg === "3") {
+        var today = new Date().toLocaleDateString();
+        if (user.lastAttendance === today) return replier.reply("🔔 오늘 출석을 이미 완료했습니다.");
+        
+        user.money += 100; user.exp += 50; user.lastAttendance = today;
+        var up = UserDB.checkLevelUp(user);
+        UserDB.save(sender, user);
+        
+        replier.reply("🎁 [ 출석 완료 ]\n+100G / +50EXP 획득!" + (up ? "\n🎊 레벨업! Lv." + user.level : ""));
+        return;
+    }
+};
+
+module.exports = Handler;
