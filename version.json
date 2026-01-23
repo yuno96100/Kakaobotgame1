@@ -1,7 +1,8 @@
 {
-  "version": "1.0.4",
-  "note": "업데이트 노트 기능 추가 및 삭제 로직 안정화",
+  "version": "1.0.9",
+  "note": "단체방 미가입자 자동 안내 및 개인톡 가입 시스템 통합 완료",
   "files": [
-    "main.js"
+    "main.js",
+    "modules/handler.js"
   ]
 }
