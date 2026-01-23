@@ -5,7 +5,7 @@ const AdminDB = require("./admin");
 const Handler = {};
 
 // [설정] 시스템(서브폰) 프로필 링크 또는 오픈채팅 링크
-const PRIVATE_CHAT_LINK = "https://open.kakao.com/o/sXXXXXX"; 
+const PRIVATE_CHAT_LINK = "https://open.kakao.com/o/s4pX9Nci"; 
 
 Handler.process = function(msg, sender, replier, room) {
     if (!msg || !msg.startsWith(".")) return; // 점(.)으로 시작하는 명령어만 처리
