@@ -1,6 +1,6 @@
 {
-  "version": "1.2.4",
-  "note": "1. 업데이트 UI 복구\n2. 입장 즉시 환영 로직 추가\n3. 미가입자 단체방 채팅 차단 강화",
+  "version": "1.2.5",
+  "note": "입장 시 자동 데이터 생성 시스템(자동 가입) 도입",
   "files": [
     "main.js",
     "modules/handler.js"
