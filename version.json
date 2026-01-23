@@ -1,5 +1,5 @@
 {
-  "version": "1.1.4",
+  "version": "1.1.5",
   "updateNote": "가입 유도 강화: 미가입자 대화 시 무조건 가입 안내 반복 출력",
   "files": ["modules/handler.js"]
 }
