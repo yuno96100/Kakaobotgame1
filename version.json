@@ -1,6 +1,6 @@
 {
-  "version": "1.0.9",
-  "note": "단체방 미가입자 자동 안내 및 개인톡 가입 시스템 통합 완료",
+  "version": "1.1.0",
+  "note": "관리자 포함 미가입자 전체 안내 로직 강화",
   "files": [
     "main.js",
     "modules/handler.js"
