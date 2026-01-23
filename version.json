@@ -1,5 +1,5 @@
 {
-  "version": "1.4.1",
+  "version": "1.4.2",
   "updateNote": "브릿지 시스템 범용성 업데이트\n- [Logic] 고정 관리자 닉네임 의존성 제거\n- [Feature] '.연동전송 [방이름] [내용]' 커맨드 구현\n- [System] 발신자 및 방 정보 동적 파싱 적용",
   "files": [
     "main.js",
