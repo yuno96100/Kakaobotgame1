@@ -2,7 +2,7 @@ const UserDB = require("./user");
 const AdminDB = require("./admin");
 
 // [설정] 시스템(서브폰) 프로필 링크 또는 오픈채팅 링크
-const PRIVATE_CHAT_LINK = "https://open.kakao.com/o/sXXXXXX"; 
+const PRIVATE_CHAT_LINK = "https://open.kakao.com/o/s4pX9Nci"; 
 
 Handler.process = function(msg, sender, replier, room) {
     if (!msg) return;
