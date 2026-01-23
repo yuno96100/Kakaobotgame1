@@ -1,6 +1,6 @@
 {
-  "version": "1.1.0",
-  "note": "관리자 포함 미가입자 전체 안내 로직 강화",
+  "version": "1.1.1",
+  "note": "관리자 가입 안내 강제 활성화 및 진단 로직 추가",
   "files": [
     "main.js",
     "modules/handler.js"
