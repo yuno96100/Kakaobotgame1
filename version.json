@@ -1,10 +1,7 @@
 {
-  "version": "1.0.1",
-  "updateNote": "초기상태",
+  "version": "1.0.6",
+  "updateNote": "재구축 완료: 숫자 세션 메뉴, 중복 가입 처리, 관리자 전용 도구 통합",
   "files": [
-    "main.js",
-    "modules/handler.js",
-    "modules/user.js",
-    "modules/admin.js"
+    "modules/handler.js"
   ]
 }
