@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "updateNote": "핸들러 초기화: 초기 안정 구조 롤백 및 숫자 메뉴 세션 통합",
   "files": ["modules/handler.js"]
 }
