@@ -1,5 +1,6 @@
 const USER_PATH = "sdcard/msgbot/Bots/sub/data/";
-const UserCache = {}; 
+const UserCache = {};
+
 const UserDB = {};
 
 UserDB.get = function(name) {
@@ -20,7 +21,20 @@ UserDB.get = function(name) {
 
 UserDB.save = function(name, data) {
     UserCache[name] = data;
-    FileStream.write(USER_PATH + name + ".json", JSON.stringify(data, null, 2));
+    try {
+        var jsonStr = JSON.stringify(data, null, 2);
+        // [Atomic Write] 임시 파일에 먼저 쓰고 성공 시 교체
+        var tempFile = USER_PATH + name + ".json.tmp";
+        var realFile = USER_PATH + name + ".json";
+        
+        FileStream.write(tempFile, jsonStr);
+        var f = new java.io.File(tempFile);
+        if (f.exists()) {
+            f.renameTo(new java.io.File(realFile));
+        }
+    } catch (e) {
+        Log.error("데이터 저장 실패: " + name + " / " + e.message);
+    }
 };
 
 UserDB.checkLevelUp = function(user) {
