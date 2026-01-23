@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0",
-  "updateNote": "관리자-유저 통합 체계 구축: 관리자의 일반 플레이 권한 및 전용 관리 권한 분리 적용",
-  "files": ["modules/handler.js"]
+  "version": "1.0.0",
+  "updateNote": "초기화",
+  "files": ["main.js"]
 }
