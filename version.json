@@ -1,6 +1,6 @@
 {
-  "version": "1.1.4",
-  "note": "방 해시 식별 시스템 및 미가입자 자동 안내 엔진 통합",
+  "version": "1.1.5",
+  "note": "방 해시 진단 명령어 위치 수정 및 로직 최적화",
   "files": [
     "main.js",
     "modules/handler.js"
