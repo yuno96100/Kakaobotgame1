@@ -1,5 +1,5 @@
 // 모듈 로드 (경로 주의: ./modules/ 폴더 안에 handler.js가 있어야 함)
-const Handler = require("./modules/handler");
+const Handler = require("./modules/handler.js");
 
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
     
