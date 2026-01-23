@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "updateNote": "Main-Handler 연동 최적화 및 /업데이트 로직 보강",
   "files": [
     "main.js",
