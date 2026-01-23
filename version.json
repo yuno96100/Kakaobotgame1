@@ -1,5 +1,11 @@
 {
-  "version": "1.1.7",
-  "updateNote": "출석 문구 수정 및 숫자 명령어(1, 2, 3) 트리거 추가",
-  "files": ["modules/handler.js"]
+  "version": "1.4.0",
+  "updateNote": "시스템 전면 개편: 단체방-개인톡 역할 분리 및 전용 모듈(Bridge, Manager) 연동 완료",
+  "files": [
+    "modules/handler.js",
+    "modules/user.js",
+    "modules/bridge.js",
+    "modules/admin.js",
+    "modules/manager.js"
+  ]
 }
