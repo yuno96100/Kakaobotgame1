@@ -1,9 +1,9 @@
 // [modules/handler.js]
 const Handler = {};
 
-// --- [환경 설정] ---
-const PRIVATE_LINK = "https://open.kakao.com/o/s4pX9Nci"; // 서브폰 1:1 오픈채팅 링크
-const DATA_PATH = "/sdcard/msgbot/Bots/sub/data/";      // 유저 데이터 저장 경로
+// --- [설정 및 경로] ---
+const PRIVATE_LINK = "https://open.kakao.com/o/s4pX9Nci"; 
+const DATA_PATH = "/sdcard/msgbot/Bots/sub/data/";
 
 Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
     const hash = String(imageDB.getProfileHash()).trim();
@@ -13,10 +13,10 @@ Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
     if (room === "게임봇") {
         var isRegistered = new java.io.File(FILE_PATH).exists();
 
-        // 미가입자가 채팅을 칠 경우 자동 안내
+        // 관리자라 하더라도 데이터 파일(.json)이 없으면 안내 대상이 됨
         if (!isRegistered) {
-            // 관리자 명령어 및 시스템 명령어는 안내 제외 (도배 방지)
-            if (msg.startsWith(".업데이트") || msg.startsWith(".테스트")) return;
+            // 시스템 핵심 명령어(.업데이트) 입력 시에는 안내를 건너뜀
+            if (msg.startsWith(".업데이트")) return;
 
             var guide = "📢 [가입 안내] " + sender + "님!\n\n";
             guide += "현재 게임봇에 등록되지 않은 상태입니다.\n";
@@ -27,22 +27,20 @@ Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
             replier.reply(guide);
             return;
         }
-        return; // 가입된 유저는 단체방에서 자유롭게 채팅 가능
+        return; 
     }
 
     // --- [섹션 B: 개인톡(1:1방) 전용 로직] ---
-    // 그룹 채팅이 아니거나, 방 이름이 단체방이 아닌 경우 수행
     if (!isGroupChat || room !== "게임봇") {
         
-        // 1. 가입 처리 로직
+        // 1. 가입 처리
         if (msg === ".가입") {
             var folder = new java.io.File(DATA_PATH);
             if (!folder.exists()) folder.mkdirs();
 
             if (new java.io.File(FILE_PATH).exists()) {
-                replier.reply("⚠️ 이미 가입된 정보가 있습니다.\n고유ID: " + hash);
+                replier.reply("⚠️ 이미 가입된 정보가 있습니다.\nID: " + hash);
             } else {
-                // 신규 유저 데이터 구조 생성
                 var userData = {
                     "name": sender,
                     "hash": hash,
@@ -51,13 +49,11 @@ Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
                     "exp": 0,
                     "joinDate": new Date().toLocaleString()
                 };
-                
                 FileStream.write(FILE_PATH, JSON.stringify(userData, null, 4));
                 
                 var successMsg = "🎊 가입이 완료되었습니다! 🎊\n";
                 successMsg += "━━━━━━━━━━━━━━\n";
                 successMsg += "👤 닉네임: " + sender + "\n";
-                successMsg += "🔑 고유ID: " + hash + "\n";
                 successMsg += "💰 초기자금: 1,000원\n";
                 successMsg += "━━━━━━━━━━━━━━\n";
                 successMsg += "이제 여기서 게임 명령어를 사용해보세요!";
@@ -65,7 +61,7 @@ Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
             }
         }
 
-        // 2. 내 정보 확인 로직
+        // 2. 내 정보 확인
         if (msg === ".내정보") {
             var data = FileStream.read(FILE_PATH);
             if (data) {
