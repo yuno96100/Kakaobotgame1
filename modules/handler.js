@@ -15,6 +15,14 @@ function isUserRegistered(sender) {
     return file.exists();
 }
 
+    // (테스트용 임시 코드)
+    if (msg === ".테스트") {
+        replier.reply("방이름: [" + room + "]\n타입: " + (isGroupChat ? "단체" : "개인"));
+        return;
+    }
+
+
+
 Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
     // 1. 데이터 경로 설정 (닉네임 기준)
     const FILE_PATH = DATA_PATH + sender + ".json";
@@ -89,3 +97,4 @@ Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
 };
 
 module.exports = Handler;
+
