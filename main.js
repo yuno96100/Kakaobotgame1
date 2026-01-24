@@ -1,18 +1,27 @@
-// [메인 폰 전용 script.js]
-const MASTER_HASH = "여기에_메인폰_해시값을_입력하세요"; // .내해시 로 확인 후 교체
-
+// [main.js]의 response 함수 부분
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-    const hash = imageDB.getProfileHash();
-
-    // 관리자 본인이 보낸 메시지인지 확인
-    if (hash !== MASTER_HASH) return;
-
-    if (msg === ".업데이트") {
-        replier.reply("✅ [시스템] 서버 폰에 업데이트 신호를 송신합니다.");
-        // 서브 폰은 이 메시지를 읽고 업데이트 함수를 실행하게 됩니다.
+    const userHash = String(imageDB.getProfileHash()).trim();
+    
+    // 1. 업데이트 명령어 (최우선)
+    if (msg === ".업데이트" && userHash === MASTER_HASH) { 
+        updateBot(replier); 
+        return; 
     }
+    
+    try {
+        // 2. 테스트 모듈 먼저 실행
+        const Tester = require("modules/tester");
+        if (Tester.check(room, msg, sender, replier, imageDB, isGroupChat)) {
+            return; // 테스트 명령어가 실행되었다면 여기서 종료
+        }
 
-    if (msg === ".내해시") {
-        replier.reply("👤 관리자님의 해시값:\n" + hash);
+        // 3. 테스트가 아니라면 일반 게임 핸들러 실행
+        const Handler = require("modules/handler");
+        if (Handler && typeof Handler.process === "function") {
+            Handler.process(room, msg, sender, replier, imageDB, isGroupChat);
+        }
+    } catch (e) {
+        // 에러 발생 시 로그 (개발 중에만 켜두세요)
+        // replier.reply("Error: " + e.message);
     }
 }
