@@ -15,12 +15,6 @@ function isUserRegistered(sender) {
     return file.exists();
 }
 
-    // (테스트용 임시 코드)
-    if (msg === ".테스트") {
-        replier.reply("방이름: [" + room + "]\n타입: " + (isGroupChat ? "단체" : "개인"));
-        return;
-    }
-
 
 
 Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
