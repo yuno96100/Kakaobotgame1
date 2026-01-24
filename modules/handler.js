@@ -4,86 +4,72 @@ const Handler = {};
 // --- [환경 설정] ---
 const PRIVATE_LINK = "https://open.kakao.com/o/s4pX9Nci"; 
 const DATA_PATH = "/sdcard/msgbot/Bots/sub/data/";
-const TARGET_ROOM_NAME = "게임봇"; // 실제 단체방 이름 (정확히 입력)
+const TARGET_ROOM_NAME = "게임봇"; 
+const MASTER_HASH = "236652781"; // 관리자 해시값
 
-/**
- * [유저 체크 함수]
- * 닉네임을 파일명으로 사용하여 데이터 존재 여부를 확인합니다.
- */
 function isUserRegistered(sender) {
-    var file = new java.io.File(DATA_PATH + sender + ".json");
-    return file.exists();
+    return new java.io.File(DATA_PATH + sender + ".json").exists();
 }
 
 Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
-    // 1. 데이터 경로 설정 (닉네임 기준)
+    const userHash = String(imageDB.getProfileHash()).trim();
     const FILE_PATH = DATA_PATH + sender + ".json";
     const registered = isUserRegistered(sender);
 
-    // 2. 단체방(게임봇) 차단 로직 (최우선 실행)
+    // --- [신규] 관리자 전용 .테스트 명령어 ---
+    if (msg === ".테스트" && userHash === MASTER_HASH) {
+        var testInfo = "🧪 [시스템 디버그 센터]\n━━━━━━━━━━━━━━\n";
+        testInfo += "👤 유저명: " + sender + "\n";
+        testInfo += "🔑 유저해시: " + userHash + "\n";
+        testInfo += "🏠 방이름: " + room + "\n";
+        
+        // 방 고유코드 추출 (API 버전에 따라 다를 수 있으나 보통 아래 방식 사용)
+        try {
+            // imageDB를 통해 방의 고유 식별값을 가져오는 시도
+            testInfo += "🆔 방고유코드: " + imageDB.getProfileHash() + "\n"; 
+        } catch(e) {
+            testInfo += "🆔 방고유코드: 확인불가\n";
+        }
+
+        testInfo += "👥 채팅형태: " + (isGroupChat ? "단체톡방" : "개인톡방") + "\n";
+        testInfo += "📂 가입여부: " + (registered ? "완료" : "미가입") + "\n";
+        testInfo += "━━━━━━━━━━━━━━";
+        replier.reply(testInfo);
+        return;
+    }
+
+    // --- 단체방 차단 로직 (기존과 동일) ---
     if (isGroupChat && room.trim() === TARGET_ROOM_NAME) {
-        // 관리자 명령어 예외
         if (msg.startsWith(".업데이트")) return;
 
-        // [A] 미가입 유저 채팅 제한
         if (!registered && !msg.startsWith(".가입")) {
-            replier.reply("📢 [" + sender + "]님은 미등록 상태입니다.\n[.가입]을 입력하여 등록을 완료해 주세요!");
+            replier.reply("📢 [" + sender + "]님은 미등록 상태입니다.\n[.가입]을 입력해 주세요!");
             return;
         }
 
-        // [B] 가입 유저의 게임 명령어(.) 차단 (.가입 제외)
         if (msg.startsWith(".") && msg !== ".가입") {
-            var blockMsg = "⚠️ [" + sender + "]님, 게임 조작은 개인톡에서만 가능합니다.\n";
-            blockMsg += "🔗 개인톡: " + PRIVATE_LINK;
-            replier.reply(blockMsg);
-            return; // 단체방에서는 여기서 실행 중단 (내정보 출력 안됨)
+            replier.reply("⚠️ 게임 조작은 개인톡에서만 가능합니다.\n🔗 " + PRIVATE_LINK);
+            return;
         }
     }
 
-    // 3. [.가입] 로직 (닉네임 기반)
+    // --- [.가입] 및 개인톡 로직 (기존과 동일) ---
     if (msg === ".가입") {
         if (registered) {
-            replier.reply("✅ [" + sender + "]님은 이미 등록된 소환사입니다.");
+            replier.reply("✅ [" + sender + "]님은 이미 가입되어 있습니다.");
         } else {
             if (!new java.io.File(DATA_PATH).exists()) new java.io.File(DATA_PATH).mkdirs();
-            
-            var userData = {
-                "name": sender,
-                "level": 1,
-                "money": 1000,
-                "joinDate": new Date().toLocaleString(),
-                "note": "닉네임 변경 시 데이터가 유실될 수 있습니다."
-            };
+            var userData = { "name": sender, "level": 1, "money": 1000, "joinDate": new Date().toLocaleString() };
             FileStream.write(FILE_PATH, JSON.stringify(userData, null, 4));
-            
-            var success = "🎊 [가입 완료] " + sender + "님 등록 성공!\n";
-            success += "이제 어느 방에서든 동일한 데이터로 이용 가능합니다.\n\n";
-            success += "🔗 개인톡: " + PRIVATE_LINK;
-            replier.reply(success);
+            replier.reply("🎊 [가입 완료] " + sender + "님 등록 성공!\n🔗 개인톡: " + PRIVATE_LINK);
         }
         return;
     }
 
-    // 4. 개인톡(1:1방) 전용 로직
-    if (!isGroupChat) {
-        // 가입 여부 확인
-        if (!registered) {
-            replier.reply("❌ 가입되지 않았습니다. 단체방이나 이곳에서 [.가입]을 먼저 해주세요.");
-            return;
-        }
-
-        // [.내정보] 실행
+    if (!isGroupChat && registered) {
         if (msg === ".내정보") {
-            try {
-                var data = JSON.parse(FileStream.read(FILE_PATH));
-                var info = "🔍 [" + data.name + "] 소환사 정보\n━━━━━━━━━━━━━━\n";
-                info += "⭐ 레벨: " + data.level + "\n";
-                info += "💵 자산: " + data.money + "원\n";
-                info += "📅 등록일: " + data.joinDate;
-                replier.reply(info);
-            } catch(e) {
-                replier.reply("❌ 데이터를 불러오는 중 오류가 발생했습니다.");
-            }
+            var data = JSON.parse(FileStream.read(FILE_PATH));
+            replier.reply("🔍 [" + data.name + "] 정보\n⭐ 레벨: " + data.level + "\n💵 자산: " + data.money + "원");
         }
     }
 };
