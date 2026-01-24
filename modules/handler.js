@@ -2,14 +2,13 @@
 const Handler = {};
 
 // --- [환경 설정] ---
-const PRIVATE_LINK = "https://open.kakao.com/o/s4pX9Nci"; // 1:1 개인톡 링크
-const DATA_PATH = "/sdcard/msgbot/Bots/sub/data/";      // 데이터 저장 경로
-const TARGET_ROOM_NAME = "게임봇"; // 실제 단체방 이름 (정확히 일치해야 함)
-const MASTER_HASH = "236652781"; // 관리자(사용자님)의 고유 해시값
+const PRIVATE_LINK = "https://open.kakao.com/o/s4pX9Nci"; 
+const DATA_PATH = "/sdcard/msgbot/Bots/sub/data/";
+const TARGET_ROOM_NAME = "게임봇"; // 실제 단체방 이름 (정확히 입력)
 
 /**
- * [유저 등록 확인 함수]
- * 닉네임을 기반으로 데이터 파일 존재 여부를 체크합니다.
+ * [유저 체크 함수]
+ * 닉네임을 파일명으로 사용하여 데이터 존재 여부를 확인합니다.
  */
 function isUserRegistered(sender) {
     var file = new java.io.File(DATA_PATH + sender + ".json");
@@ -17,51 +16,34 @@ function isUserRegistered(sender) {
 }
 
 Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
-    // 1. 기본 정보 추출
-    const userHash = String(imageDB.getProfileHash()).trim();
+    // 1. 데이터 경로 설정 (닉네임 기준)
     const FILE_PATH = DATA_PATH + sender + ".json";
     const registered = isUserRegistered(sender);
 
-    // 2. [관리자 전용] .테스트 명령어 (방 고유 정보 확인용)
-    if (msg === ".테스트" && userHash === MASTER_HASH) {
-        var testInfo = "🧪 [시스템 디버그 모드]\n━━━━━━━━━━━━━━\n";
-        testInfo += "👤 유저닉네임: " + sender + "\n";
-        testInfo += "🔑 유저해시(방 기준): " + userHash + "\n";
-        testInfo += "🏠 현재방이름: [" + room + "]\n";
-        testInfo += "👥 채팅타입: " + (isGroupChat ? "단체톡방" : "개인톡방") + "\n";
-        testInfo += "📂 데이터파일: " + (registered ? "존재함" : "없음") + "\n";
-        testInfo += "━━━━━━━━━━━━━━";
-        replier.reply(testInfo);
-        return;
-    }
-
-    // 3. 단체방('게임봇') 전용 로직 및 차단
+    // 2. 단체방(게임봇) 차단 로직 (최우선 실행)
     if (isGroupChat && room.trim() === TARGET_ROOM_NAME) {
-        // 관리자 명령어 예외 (.업데이트 등)
+        // 관리자 명령어 예외
         if (msg.startsWith(".업데이트")) return;
 
-        // [A] 가입하지 않은 유저가 채팅 시
-        if (!registered && msg !== ".가입") {
-            var regWarn = "📢 [" + sender + "]님은 등록되지 않은 소환사입니다.\n";
-            regWarn += "대화 참여를 위해 [.가입]을 입력해 주세요!\n";
-            regWarn += "🔗 개인톡: " + PRIVATE_LINK;
-            replier.reply(regWarn);
+        // [A] 미가입 유저 채팅 제한
+        if (!registered && !msg.startsWith(".가입")) {
+            replier.reply("📢 [" + sender + "]님은 미등록 상태입니다.\n[.가입]을 입력하여 등록을 완료해 주세요!");
             return;
         }
 
-        // [B] 가입된 유저가 단체방에서 명령어(.) 입력 시 차단
+        // [B] 가입 유저의 게임 명령어(.) 차단 (.가입 제외)
         if (msg.startsWith(".") && msg !== ".가입") {
-            var blockMsg = "⚠️ [" + sender + "] 소환사님, 모든 게임 조작은 개인톡에서만 가능합니다.\n";
-            blockMsg += "🔗 1:1 개인톡: " + PRIVATE_LINK;
+            var blockMsg = "⚠️ [" + sender + "]님, 게임 조작은 개인톡에서만 가능합니다.\n";
+            blockMsg += "🔗 개인톡: " + PRIVATE_LINK;
             replier.reply(blockMsg);
-            return; 
+            return; // 단체방에서는 여기서 실행 중단 (내정보 출력 안됨)
         }
     }
 
-    // 4. [.가입] 명령어 (닉네임 기반 등록)
+    // 3. [.가입] 로직 (닉네임 기반)
     if (msg === ".가입") {
         if (registered) {
-            replier.reply("✅ [" + sender + "]님은 이미 가입되어 있습니다.");
+            replier.reply("✅ [" + sender + "]님은 이미 등록된 소환사입니다.");
         } else {
             if (!new java.io.File(DATA_PATH).exists()) new java.io.File(DATA_PATH).mkdirs();
             
@@ -69,27 +51,28 @@ Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
                 "name": sender,
                 "level": 1,
                 "money": 1000,
-                "joinDate": new Date().toLocaleString()
+                "joinDate": new Date().toLocaleString(),
+                "note": "닉네임 변경 시 데이터가 유실될 수 있습니다."
             };
             FileStream.write(FILE_PATH, JSON.stringify(userData, null, 4));
             
-            var success = "🎊 [가입 성공] " + sender + "님 환영합니다!\n";
-            success += "이제 개인톡에서 다양한 활동을 시작해 보세요.\n\n";
-            success += "🔗 1:1 개인톡: " + PRIVATE_LINK;
+            var success = "🎊 [가입 완료] " + sender + "님 등록 성공!\n";
+            success += "이제 어느 방에서든 동일한 데이터로 이용 가능합니다.\n\n";
+            success += "🔗 개인톡: " + PRIVATE_LINK;
             replier.reply(success);
         }
         return;
     }
 
-    // 5. 개인톡(1:1방) 전용 게임 로직
+    // 4. 개인톡(1:1방) 전용 로직
     if (!isGroupChat) {
-        // 미가입자 접근 차단
+        // 가입 여부 확인
         if (!registered) {
-            replier.reply("❌ 가입되지 않았습니다. 단체방이나 이곳에서 [.가입]을 먼저 진행해 주세요.");
+            replier.reply("❌ 가입되지 않았습니다. 단체방이나 이곳에서 [.가입]을 먼저 해주세요.");
             return;
         }
 
-        // [.내정보] 명령어
+        // [.내정보] 실행
         if (msg === ".내정보") {
             try {
                 var data = JSON.parse(FileStream.read(FILE_PATH));
