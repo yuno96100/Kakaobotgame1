@@ -1,9 +1,10 @@
 {
-    "version": "1.2.2",
+    "version": "1.3.0",
     "files": [
         "main.js",
         "modules/handler.js",
-        "modules/tester.js"
+        "modules/user_manager.js",
+        "modules/room_manager.js"
     ],
-    "note": "[시스템 대규모 업데이트]\n1. 보안 체계 변경: 해시값 -> 닉네임 기반 저장 (방 이동 시 데이터 연동 지원)\n2. 단체방 보호: 게임 명령어 단체방 사용 차단 및 개인톡 자동 안내\n3. 테스트 모듈 분리: 방 고유 ID 확인 기능 추가\n4. 미가입 유저 채팅 제한 로직 강화"
+    "note": "명령어 접두사 (.) 변경 및 유저/방 데이터 분리 모듈화 완료"
 }
