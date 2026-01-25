@@ -1,4 +1,3 @@
-// [modules/user_manager.js]
 const UserManager = {};
 const USER_DIR = "/sdcard/msgbot/Bots/sub/data/users/";
 
