@@ -2,37 +2,61 @@ const Handler = {};
 const User = require("user_manager");
 const Room = require("room_manager");
 
-// 일단 MASTER_HASH 체크를 잠시 무시하고 누구나 조회 가능하게 로직을 짭니다.
+const MASTER_HASH = "236652781"; // 관리자 고유 해시
+const roomName = "게임봇"; // 타겟 단체방 이름
+const PRIVATE_LINK = "https://open.kakao.com/o/s4pX9Nci";
+
 Handler.process = function(room, msg, sender, replier, imageDB, isGroupChat) {
     const userHash = String(imageDB.getProfileHash()).trim();
+    // 단체방은 이름 기반 해시, 개인톡은 P_접두사+유저해시로 구분
     const roomHash = isGroupChat ? "G_" + room.split("").reduce((a,b)=>{a=((a<<5)-a)+b.charCodeAt(0);return a&a},0) : "P_" + userHash;
 
+    // 모든 방 정보 자동 기록
     Room.saveRoom(room, roomHash);
 
-    // [중요] 누구에게나 응답하도록 설정 (해시값 확인용)
-    if (msg === ".정보조회") {
-        var res = "📊 [시스템 데이터 확인]\n━━━━━━━━━━━━━━\n";
-        res += "👤 발신자: " + sender + "\n";
-        res += "🆔 내 해시값: " + userHash + "\n\n"; // 여기서 나오는 번호를 꼭 기억하세요!
-        res += "🏠 방이름: " + room + "\n";
-        res += "🔑 방해시: " + roomHash + "\n";
+    // 1. 관리자 명령어: .정보조회
+    if (msg === ".정보조회" && userHash === MASTER_HASH) {
+        var res = "📊 [시스템 실시간 조회]\n━━━━━━━━━━━━━━\n";
+        res += "👤 유저이름: " + sender + "\n";
+        res += "🆔 유저해시: " + userHash + "\n\n";
+        res += "🏠 현재방명: " + room + "\n";
+        res += "🔑 방 해시: " + roomHash + "\n";
+        res += "👥 방 타입: " + (isGroupChat ? "단체톡" : "개인톡") + "\n";
         res += "━━━━━━━━━━━━━━";
         replier.reply(res);
         return;
     }
 
-    // --- 기존 단체방/개인톡 로직 ---
-    if (isGroupChat && room.trim() === "게임봇") {
-        if (msg === ".가입") replier.reply(sender + "님, 개인톡에서 진행해 주세요!");
+    // 2. 단체방 로직
+    if (isGroupChat && room.trim() === roomName) {
+        if (msg === ".가입" || msg === ".시작") {
+            replier.reply(sender + "님, 게임 시작은 개인톡에서만 가능합니다!\n🔗 " + PRIVATE_LINK);
+        }
         return;
     }
 
-    if (!isGroupChat && msg === ".가입") {
-        if (User.isRegistered(userHash)) {
-            replier.reply("✅ 이미 가입된 유저입니다.\nID: " + userHash);
-        } else {
-            User.register(userHash, sender);
-            replier.reply("🎊 가입 성공! 1,000원이 지급되었습니다.");
+    // 3. 개인톡 로직
+    if (!isGroupChat) {
+        if (msg === ".가입") {
+            if (User.isRegistered(userHash)) {
+                replier.reply("✅ 이미 등록된 정보가 존재합니다.\n(ID: " + userHash + ")");
+            } else {
+                User.register(userHash, sender);
+                replier.reply("🎊 가입 성공! 1,000원이 지급되었습니다.\n이제 '.내정보'를 입력해보세요.");
+            }
+        }
+
+        if (msg === ".내정보") {
+            var data = User.getData(userHash);
+            if (data) {
+                var info = "🔍 [" + data.name + "] 소환사 정보\n━━━━━━━━━━━━━━\n";
+                info += "⭐ 레벨: " + data.level + "\n";
+                info += "💵 자산: " + data.money + "원\n";
+                info += "📅 가입일: " + data.joinDate;
+                replier.reply(info);
+            } else {
+                replier.reply("❌ 가입되지 않았습니다. '.가입'을 먼저 해주세요.");
+            }
         }
     }
 };
